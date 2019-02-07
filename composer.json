@@ -1,0 +1,24 @@
+{
+    "name": "rasclatt/greystar",
+    "type": "library",
+    "description": "Class Library For the Greystar API",
+    "keywords": ["Greystar","API","framework","mlm"],
+    "homepage": "https://github.com/rasclatt/greystar",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Rayner",
+            "email": "rasclatt@me.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "rasclatt/nubersoft": "1.*"
+    },
+    "autoload": {
+		"psr-4": {
+			"Greystar\\": "/"
+		}
+	}
+}
