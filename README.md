@@ -1,8 +1,11 @@
 # Greystar API Library
-PHP Library for Greystar MLM Software
+### PHP Library for Greystar MLM Software
 
->Note that this is still being created and tested, but most features work. We do not provide any Greystar API documentation, that is provided by Greystar–ask your representative for these documents, including your API credentials.
+##### IMPORTANT NOTES:
+> * This class library is still being created and tested, but most features work.
+> * We do not provide any Greystar API documentation, that is provided by Greystar. Ask your representative for these documents, including your API credentials.
 
+##### CONTACT GREYSTAR
 For more information on establishing business with Greystar Solutions, visit https://www.greystarsolutions.com. From the site description:
 
 >Built from the ground up for Network Marketing
