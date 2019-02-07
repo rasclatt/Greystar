@@ -15,10 +15,76 @@ class Model extends \Greystar\Model
 	 */
 	public	function create(array $input)
 	{
-		
 		self::$order['raw']			=	$input;
 		self::$order['response']	=	$this->invoice($input);
 		return $this;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function createWithAutoShip(array $array, array $products)
+	{
+		$settings	=	[
+			'amount' => $array['amount'],
+			'ccaddr' => $array['ccaddr'],
+			'ccaddr2' => (!empty($array['ccaddr2']))? $array['ccaddr2'] : false,
+			'cccity' => $array['cccity'],
+			'cccountry' => $array['cccountry'],
+			'ccexpmo' => $array['ccexpmo'],
+			'ccexpyr' => $array['ccexpyr'],
+			'ccexp' => $array['ccexpmo'].$array['ccexpyr'],
+			'ccname' => $array['ccname'],
+			'ccno' => $array['ccno'],
+			'ccstate' => $array['ccstate'],
+			'cczip' => $array['cczip'],
+			'email' => $array['email'],
+			'ccphone' => $array['ccphone'],
+			'distid' => $array['distid'],
+			'newuser' => 'N',
+			'shipaddress1' => $array['shipaddress1'],
+			'shipaddress2' => (!empty($array['shipaddress2']))? $array['shipaddress2'] : false,
+			'shipcity' => $array['shipcity'],
+			'shipcountry' => $array['shipcountry'],
+			'shipstate' => $array['shipstate'],
+			'shipzip' => $array['shipzip'],
+			'inv' => $array['inv'],
+			'paid' => 'N'
+		];
+		$product	=	array_values($product);
+		foreach($products as $key => $product) {
+			if($key == 0) {
+				$settings['autoshipproduct'.$key]	=	$product['itemcode'];
+				$settings['autoshipq'.$key]			=	$product['qty'];
+			}
+			$settings['product'.$key]			=	$product['itemcode'];
+			$settings['quantity'.$key]			=	$product['qty'];
+		}
+		
+		self::$order['raw']			=	$settings;
+		self::$order['response']	=
+		$charge	=	$Greystar->doService(['creditcardcharge','invoice','createautoship'], $settings);
+		
+		if(empty($charge['Invoice'])) {
+			$this->toError(json_encode($charge));
+			return false;
+		}
+		else {
+			$this->toSuccess("Transaction Successful–Thank you for your order!");
+			foreach($charge as $key => $value) {
+				$success[strtolower(str_replace([' '],['_'], $key))]	=	ltrim($value, '$');
+			}
+			$this->modifyinvoice([
+				'username' => $settings['distid'],
+				'paid' => 'Y',
+				'inv' => $success['invoice']
+			]);
+			$this->modifyinvoice([
+				'username' => $settings['distid'],
+				'paid' => 'Y',
+				'inv' => $settings['inv']
+			]);
+			return $success;
+		}
 	}
 	
 	public	function markInvoicePaid($inv, $paid = true, $type = false)
