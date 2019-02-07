@@ -1,9 +1,9 @@
 {
-    "name": "rasclatt/greystar",
+    "name": "rasclatt/Greystar",
     "type": "library",
     "description": "Class Library For the Greystar API",
     "keywords": ["Greystar","API","framework","mlm"],
-    "homepage": "https://github.com/rasclatt/greystar",
+    "homepage": "https://github.com/rasclatt/Greystar",
     "license": "MIT",
     "authors": [
         {
