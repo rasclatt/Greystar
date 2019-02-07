@@ -3,17 +3,6 @@ namespace Greystar;
 
 class Products extends \Greystar\Model
 {
-	/**
-	category,
-	cateogryname,
-	categoryfilter		–	Send category to search prodcuts (Optional)
-	country,
-	coiuntryfilter		–	Send country (Optional)
-	description			–	Send description to search prodcuts (Optional)
-	product				–	Product to search (Optional)
-	showfreesalestax	–	Send Y to show free sales tax (Optional)
-	showfreeshpping		–	Send Y to show free shipping (Optional)
-	**/
 	public	function getProductList($args=false)
 	{
 		# Fetch the list from the API
