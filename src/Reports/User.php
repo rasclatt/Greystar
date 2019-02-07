@@ -3,25 +3,13 @@ namespace Greystar\Reports;
 
 class User extends \Greystar\Reports
 {
-	public	static	$types	=	[
-						'all',
-						'inactive',
-						'promoter',
-						'active_promoter',
-						'qualified_promoter',
-						'promoter_500',
-						'promoter_1k',
-						'executive',
-						'senior_executive',
-						'managing_executive',
-						'director',
-						'regional_director',
-						'national_director',
-						'global_director',
-						'global_diamond',
-						'global_presidential',
-						'global_ambassador'
-					];
+	public	static	$types	=	[];
+	
+	public	function setRankNames(array $ranks)
+	{
+		self:$types	=	$ranks;
+		return $this;
+	}
 	
 	public	function getTopEarners()
 	{
