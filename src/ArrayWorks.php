@@ -58,7 +58,8 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 			$new[$nkey]	=	$value;
 		}
 		
-		$array	=	$new;
+		if(!empty($new))
+			$array	=	$new;
 	}
 	
 	public	static	function convertValues(&$array)
