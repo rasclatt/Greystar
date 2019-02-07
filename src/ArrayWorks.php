@@ -20,7 +20,7 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 				$new[]	=	array_combine($keys,$row);
 			}
 
-			return $new;
+			return (!empty($new))? $new : false;
 		}
 		
 		return $array;
