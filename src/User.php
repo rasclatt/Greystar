@@ -92,7 +92,7 @@ class User extends \Greystar\Model
 		return (!empty($arr['avatar']))? $arr['avatar'] : false;
 	}
 	
-	public	function getDistType()
+	public	function getDistType($username)
 	{
 		$arr	=	$this->getUserValue('user', $username);
 		return (!empty($arr['member_type']))? $arr['member_type'] : false;
