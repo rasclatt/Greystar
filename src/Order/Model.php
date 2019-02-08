@@ -50,7 +50,8 @@ class Model extends \Greystar\Model
 			'inv' => $array['inv'],
 			'paid' => 'N'
 		];
-		$product	=	array_values($product);
+		
+		$products	=	array_values($products);
 		foreach($products as $key => $product) {
 			if($key == 0) {
 				$settings['autoshipproduct'.$key]	=	$product['itemcode'];
@@ -62,7 +63,7 @@ class Model extends \Greystar\Model
 		
 		self::$order['raw']			=	$settings;
 		self::$order['response']	=
-		$charge	=	$Greystar->doService(['creditcardcharge','invoice','createautoship'], $settings);
+		$charge	=	$this->doService(['creditcardcharge','invoice','createautoship'], $settings);
 		
 		if(empty($charge['Invoice'])) {
 			$this->toError(json_encode($charge));
