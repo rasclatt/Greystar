@@ -54,10 +54,10 @@ class Model extends \Greystar\Model
 		foreach($products as $key => $product) {
 			if($key == 0) {
 				$settings['autoshipproduct'.$key]	=	$product['itemcode'];
-				$settings['autoshipq'.$key]			=	$product['qty'];
+				$settings['autoshipq'.$key]			=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
 			}
 			$settings['product'.$key]			=	$product['itemcode'];
-			$settings['quantity'.$key]			=	$product['qty'];
+			$settings['quantity'.$key]			=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
 		}
 		
 		self::$order['raw']			=	$settings;
