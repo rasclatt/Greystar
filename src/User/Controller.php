@@ -18,6 +18,11 @@ class Controller extends \Greystar\User
 	
 	public	function isRetail($distid)
 	{
-		return ($this->getDistType($distid) == 'Retail');
+		return (strtolower($this->getDistType($distid)) == 'retail');
+	}
+	
+	public	function isDistributor($distid)
+	{
+		return (!$this->isRetail($distid));
 	}
 }
