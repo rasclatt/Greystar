@@ -10,11 +10,11 @@ class Model extends \Greystar\Order\Controller
 	/**
 	 *	@description	
 	 */
-	public	function getOrdersToShip($country = false)
+	public	function getOrdersToShip($country = false, $backtime = 'today - 4 weeks')
 	{
 		$Reports	=	new Reports();
 		$attr	=	[
-			'startdate'=>date('Y-m-d',strtotime('today - 4 weeks')),
+			'startdate'=>date('Y-m-d',strtotime($backtime)),
 			'enddate'=>date('Y-m-d',strtotime('today'))
 		];
 		
