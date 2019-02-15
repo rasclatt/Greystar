@@ -28,7 +28,7 @@ class Subscription extends \Greystar\User
 		}, $autoship['autoships']) : [];
 	}
 	/**
-	 *	@description	
+	 *	@description	Fetches the users products on an autoship
 	 */
 	public	function getProducts($distid)
 	{
@@ -51,5 +51,13 @@ class Subscription extends \Greystar\User
 		}
 		
 		return	$autoship;
+	}
+	/**
+	 *	@description	Checks if the user has an autoship set up
+	 */
+	public	function hasAutoShip($distid)
+	{
+		$arr	=	$this->get($distid);
+		return (isset($arr[0]['no_autoship']))? false : true;
 	}
 }
