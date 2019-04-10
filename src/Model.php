@@ -170,6 +170,8 @@ class Model extends \Nubersoft\nApp
 					return (is_callable($func))? $func($contents) : $contents;
 			}
 		}
+		# Send back just the raw response, use callable 
+		return (is_callable($func))? $func($contents) : $contents;
 	}
 	/**
 	 *	@description	Checks if errors came from the API response

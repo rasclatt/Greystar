@@ -10,9 +10,20 @@ class Controller extends \Greystar\User
 		return $this->isRetail($distid);
 	}
 	
-	public	function toDistributor($distid)
+	public	function toDistributor($distid, $leg = false)
 	{
-		$this->modify(['username' => $distid, 'distrib' => 'D']);
+		if(!is_bool($leg)) {
+			$leg	=	(strtolower($leg) == 'l')? 0 : 1;
+		}
+		$settings	=	[
+			'username' => $distid,
+			'distrib' => 'D'
+		];
+		
+		if(!empty($leg))
+			$settings['leg']	=	$leg;
+		
+		$this->modify($settings);
 		return empty($this->isRetail($distid));
 	}
 	

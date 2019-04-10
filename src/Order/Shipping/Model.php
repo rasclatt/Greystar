@@ -10,6 +10,65 @@ class Model extends \Greystar\Order\Controller
 	/**
 	 *	@description	
 	 */
+	public	function getAllOrdersToShip($country = false, $backtime = 'today - 4 weeks')
+	{
+		$Reports	=	new Reports();
+		$attr	=	[
+			'startdate'=>date('Y-m-d',strtotime($backtime)),
+			'enddate'=>date('Y-m-d',strtotime('today'))
+		];
+		
+		$orders	=	array_values(array_filter($Reports->getReport('notrack', $attr, false, function($rows){
+
+			$arr	=	array_map(function($v){
+				return str_getcsv($v,"\t");
+			}, explode(PHP_EOL, $rows));
+
+			if(!empty($arr[0])) {
+				$keys	=	array_map(function($v){
+					return str_replace([' ','#','no.'],['_','num','num'],strtolower($v));
+				},$arr[0]);
+
+				unset($arr[0]);
+				$count	=	count($keys);
+				$data	=	array_map(function($v) use ($keys, $count){
+					$vc	=	count($keys) - count($v);
+					if($count > $vc) {
+						for($i = 0; $i < $vc; $i++) {
+							$v[]	=	'';
+						}
+					}
+					$v	=	array_combine($keys, $v);
+					
+					return $v;
+					
+				}, $arr);
+
+				return $data;
+			}
+		})));
+		
+		$ids	=	[];
+		
+		if(empty($orders))
+			return $ids;
+		
+		foreach($orders as $order) {
+			if(!empty($country)) {
+				if(in_array($order['country'], $country)) {
+					$ids[]	=	$order['invoice_num'];
+				}
+			}
+			else {
+				$ids[]	=	$order['invoice_num'];
+			}
+		}
+		
+		return $ids;
+	}
+	/**
+	 *	@description	
+	 */
 	public	function getOrdersToShip($country = false, $backtime = 'today - 4 weeks')
 	{
 		$Reports	=	new Reports();

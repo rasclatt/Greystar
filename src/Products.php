@@ -6,7 +6,7 @@ class Products extends \Greystar\Model
 	public	function getProductList($args=false)
 	{
 		# Fetch the list from the API
-		$data	=	$this->listOfProducts($args,function($data){
+		$data	=	$this->listofproducts($args, function($data){
 			# Combine the header with rows
 			return ArrayWorks::combineColumnRows($data);
 		});

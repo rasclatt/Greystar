@@ -5,6 +5,8 @@ use \Greystar\User\Subscription;
 
 class User extends \Greystar\Model
 {
+	private	$protected;
+	
 	protected	$types	=	[
 		'P'=> 'Promoter',
 		'C'=> 'Preferred',
@@ -13,19 +15,36 @@ class User extends \Greystar\Model
 	
 	protected	$user	=	[];
 	/**
+	 *	@description	
+	 */
+	public	function __construct($username=false)
+	{
+		$this->setDistId($username);
+	}
+	
+	protected	function setDistId($username)
+	{
+		if(!empty($username))
+			$this->distid	=	trim($username);
+		
+		return $this;
+	}
+	
+	/**
 	*	@description	Check and filter username to allow only a-z0-9
 	*/
-	public	static	function validUsername($username)
+	public	static	function validUsername($username = false)
 	{
-		$username	=	trim($username);
-		return (preg_match('/^[a-z0-9]{3,30}$/',$username))? $username : false;
+		$this->setDistId($username);
+		return (preg_match('/^[a-z0-9]{3,30}$/',$this->distid))? $this->distid : false;
 	}
 	/**
 	*	@description	Check if username exists
 	*/
-	public	function userExists($username)
+	public	function userExists($username = false)
 	{
-		$data	=	$this->goodusername(['distid'=>$username]);
+		$this->setDistId($username);
+		$data	=	$this->goodusername(['distid'=>$this->distid]);
 		
 		if(empty($data['result']))
 			return false;
@@ -33,19 +52,22 @@ class User extends \Greystar\Model
 		return ($data['result'] == 'In Use');
 	}
 	
-	public	function getDist($username, $flags=[])
+	public	function getDist($username=false, $flags=[])
 	{
+		$this->setDistId($username);
+		
 		$this->user	=	$this->getuserdata(array_merge([
-			'distid' => $username,
+			'distid' => $this->distid,
 			'returntype'=>'all'
 		],$flags));
 		
 		return $this;
 	}
 	
-	public	function getDistInfo($username, $flags = [])
+	public	function getDistInfo($username = false, $flags = [])
 	{
-		$user	=	$this->getDist($username, $flags)->user;
+		$this->setDistId($username);
+		$user	=	$this->getDist($this->distid, $flags)->user;
 		$user	=	(!empty($user))? array_combine(array_map(function($v){
 			return rtrim($v, ':');
 		}, array_keys($user)), $user) : [];
@@ -78,7 +100,7 @@ class User extends \Greystar\Model
 		}
 		
 		if(!empty($new['autoship'])) {
-			$new['autoship']	=	(new Subscription())->get($username);
+			$new['autoship']	=	(new Subscription())->get($this->distid);
 		}
 		
 		ksort($new);
@@ -86,41 +108,49 @@ class User extends \Greystar\Model
 		return $new;
 	}
 	
-	public	function getAvatar($username)
+	public	function getAvatar($username=false)
 	{
-		$arr	=	$this->getUserValue('user',$username);
+		$this->setDistId($username);
+		$arr	=	$this->getUserValue('user',$this->distid);
 		return (!empty($arr['avatar']))? $arr['avatar'] : false;
 	}
 	
-	public	function getDistType($username)
+	public	function getDistType($username=false)
 	{
-		$arr	=	$this->getUserValue('user', $username);
+		$this->setDistId($username);
+		$arr	=	$this->getUserValue('user', $this->distid);
 		return (!empty($arr['member_type']))? $arr['member_type'] : false;
 	}
 	
-	public	function getShippingInfo($username)
+	public	function getShippingInfo($username=false)
 	{
-		if(empty($this->user))
-			$this->user	=	$this->getDistInfo($username);
+		$this->setDistId($username);
 		
-		return $this->getUserValue('shipping', $username);
+		if(empty($this->user))
+			$this->user	=	$this->getDistInfo($this->distid);
+		
+		return $this->getUserValue('shipping', $this->distid);
 	}
 	
-	public	function getBillingInfo($username)
+	public	function getBillingInfo($username=false)
 	{
-		if(empty($this->user))
-			$this->user	=	$this->getDistInfo($username);
+		$this->setDistId($username);
 		
-		return $this->getUserValue('billing', $username);
+		if(empty($this->user))
+			$this->user	=	$this->getDistInfo($this->distid);
+		
+		return $this->getUserValue('billing', $this->distid);
 	}
 	
-	public	function getUserValue($key, $username)
+	public	function getUserValue($key, $username=false)
 	{
+		$this->setDistId($username);
+		
 		if(!empty($this->user[$key]))
 			return $this->user[$key];
 		else {
-			if(!empty($username))
-				$this->user	=	$this->getDistInfo($username);
+			if(!empty($this->distid))
+				$this->user	=	$this->getDistInfo($this->distid);
 			
 			return (!empty($this->user[$key]))? $this->user[$key] : false;
 		}
@@ -128,8 +158,10 @@ class User extends \Greystar\Model
 	
 	public	function getUserArray($pattern,$username=false)
 	{
-		if(empty($this->user) && !empty($username))
-			$data	=	$this->getDistInfo($username);
+		$this->setDistId($username);
+		
+		if(empty($this->user) && !empty($this->distid))
+			$data	=	$this->getDistInfo($this->distid);
 		else
 			$data	=	$this->user;
 		$store	=	[];

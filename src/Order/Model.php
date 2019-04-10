@@ -26,6 +26,13 @@ class Model extends \Greystar\Model
 	{
 		$settings	=	[
 			'amount' => $array['amount'],
+			'billaddress1' => $array['ccaddr'],
+			'billaddress2' => (!empty($array['ccaddr2']))? $array['ccaddr2'] : false,
+			'billcity' => $array['cccity'],
+			'billcountry' => $array['cccountry'],
+			'billstate' => $array['ccstate'],
+			'billzip' => $array['cczip'],
+			'billphone' => $array['ccphone'],
 			'ccaddr' => $array['ccaddr'],
 			'ccaddr2' => (!empty($array['ccaddr2']))? $array['ccaddr2'] : false,
 			'cccity' => $array['cccity'],
@@ -40,6 +47,7 @@ class Model extends \Greystar\Model
 			'email' => $array['email'],
 			'ccphone' => $array['ccphone'],
 			'distid' => $array['distid'],
+			'username' => $array['distid'],
 			'newuser' => 'N',
 			'shipaddress1' => $array['shipaddress1'],
 			'shipaddress2' => (!empty($array['shipaddress2']))? $array['shipaddress2'] : false,
@@ -47,43 +55,52 @@ class Model extends \Greystar\Model
 			'shipcountry' => $array['shipcountry'],
 			'shipstate' => $array['shipstate'],
 			'shipzip' => $array['shipzip'],
-			'inv' => $array['inv'],
 			'paid' => 'N'
 		];
 		
 		$products	=	array_values($products);
+		$a	=	1;
 		foreach($products as $key => $product) {
-			if($key == 0) {
-				$settings['autoshipproduct'.$key]	=	$product['itemcode'];
-				$settings['autoshipq'.$key]			=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
+			if($a == 1) {
+				$settings['autoshipproduct'.$a]	=	$product['itemcode'];
+				$settings['autoshipq'.$a]		=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
 			}
-			$settings['product'.$key]			=	$product['itemcode'];
-			$settings['quantity'.$key]			=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
+			
+			$settings['product'.$a]	=	$product['itemcode'];
+			$settings['qty'.$a]		=
+			/*$settings['quantity'.$a]	=	*/(!empty($product['qty']))? $product['qty'] : $product['quantity'];
+			
+			$a++;
 		}
 		
 		self::$order['raw']			=	$settings;
-		self::$order['response']	=
-		$charge	=	$this->doService(['creditcardcharge','invoice','createautoship'], $settings);
 		
-		if(empty($charge['Invoice'])) {
-			$this->toError(json_encode($charge));
+		if($this->userGet('distid') == 275418) {
+		}
+		# Create Autoship
+		$ascreate			=	$this->doService(['creditcardstore','createautoship'], $settings);
+		$settings['inv']	=	$array['inv'];
+		# Create the invoice order
+		self::$order['response']	=	
+		$charge	=	$this->doService(['creditcardcharge','invoice'], $settings);
+		# Stop if fail
+		if(!empty($charge['error']) || (!empty($charge['result']) && stripos($charge['result'], 'fail') !== false)) {
+			$this->doService('deleteautoship', ['distid' => $this->userGet('distid')]);
+			$this->toError((!empty($charge['error']))? $charge['error'] : $charge['result']);
 			return false;
 		}
 		else {
+			# Set as paid
+			$this->modifyinvoice([
+				'username' => $settings['distid'],
+				'paid' => 'Y',
+				'inv' => $charge['Invoice']
+			]);
+			# Store
 			$this->toSuccess("Transaction Successful–Thank you for your order!");
 			foreach($charge as $key => $value) {
 				$success[strtolower(str_replace([' '],['_'], $key))]	=	ltrim($value, '$');
 			}
-			$this->modifyinvoice([
-				'username' => $settings['distid'],
-				'paid' => 'Y',
-				'inv' => $success['invoice']
-			]);
-			$this->modifyinvoice([
-				'username' => $settings['distid'],
-				'paid' => 'Y',
-				'inv' => $settings['inv']
-			]);
 			return $success;
 		}
 	}
@@ -152,8 +169,8 @@ class Model extends \Greystar\Model
 					preg_match('/([\d]+) of ([\w]+)/',trim($v), $match);
 
 					return [
-						'itemcode' => $match[2],
-						'quantity' => $match[1]
+						'itemcode' => (isset($match[2]))? $match[2] : false,
+						'quantity' => (isset($match[1]))? $match[1] : false,
 					];
 
 				},explode(',', $v['products']));
