@@ -75,8 +75,8 @@ class User extends \Greystar\Reports
 		return ($limit > 1)? $data : $data[0];
 	}
 	
-	public	function getDistInfo($username)
+	public	function getDistInfo($username, $flags = [], $qv = false)
 	{
-		return self::getuserdata(['distid' => $username,'returntype' => 'all']);
+		return $this->getHelper('Greystar\User')->getDistInfo($username, $flags, $qv);
 	}
 }

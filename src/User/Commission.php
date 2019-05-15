@@ -141,9 +141,13 @@ class Commission extends \Greystar\User\Controller
 	{	
 		switch($class) {
 			case('getData'):
-				if(!empty($args[0]))
-					return (isset($this->data[$args[0]]))? $this->data[$args[0]] : false;
-
+				if(!empty($args[0])) {
+					if(is_callable($args[0])) {
+						return $args[0]($this->data);
+					}
+					else
+						return (isset($this->data[$args[0]]))? $this->data[$args[0]] : false;
+				}
 				return $this->data;
 			case('toJson'):
 				return json_encode($this->data);

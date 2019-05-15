@@ -5,15 +5,34 @@ use \Greystar\User\Subscription;
 
 class User extends \Greystar\Model
 {
-	private	$protected;
+	private	$protected,
+			$flags;
+	
+	private	$ranks_list	=	[
+		'promoter',
+		'active_promoter',
+		'qualified_promoter',
+		'promoter_500',
+		'promoter_1k',
+		'executive',
+		'senior_executive',
+		'managing_executive',
+		'director',
+		'regional_director',
+		'national_director',
+		'global_director',
+		'global_diamond',
+		'global_presidential',
+		'global_ambassador'
+	];
 	
 	protected	$types	=	[
 		'P'=> 'Promoter',
 		'C'=> 'Preferred',
 		'R' => 'Retail'
 	];
-	
-	protected	$user	=	[];
+	protected	$raw_user	=	[];
+	protected	$user		=	[];
 	/**
 	 *	@description	
 	 */
@@ -51,20 +70,49 @@ class User extends \Greystar\Model
 		
 		return ($data['result'] == 'In Use');
 	}
-	
-	public	function getDist($username=false, $flags=[])
+	/**
+	*	@description	Check if username is suspended
+	*/
+	public	function isSuspended($username = false)
 	{
+		if(!empty($this->user['general']['status']))
+			$status['status']	=	$this->user['general']['status'];
+		else {
+			$this->setDistId($username);
+			$status	=	$this->getDist($this->distid)->getUserArray('/status/i');
+		}
+		return (!empty($status['status']) && stripos($status['status'], 'suspended') !== false);
+	}
+	/**
+	 *	@description	
+	 */
+	public	function includeFlags($flags = false)
+	{
+		$this->flags	=	(!empty($flags))? $flags : ['includeflags' => 'all'];
+		return $this;
+	}
+	
+	public	function getDist($username=false, $flags=[], $qv = false)
+	{
+		if(empty($flags) && !empty($this->flags))
+			$flags	=	$this->flags;
+		
 		$this->setDistId($username);
 		
+		if(empty($this->distid))
+			return $this;
+		$this->raw_user	=
 		$this->user	=	$this->getuserdata(array_merge([
 			'distid' => $this->distid,
-			'returntype'=>'all'
+			'returntype' => 'all',
+			'showqv' => (!empty($qv))? $qv : date('Y-m-d'),
+			'includeflags' => 'all'
 		],$flags));
 		
 		return $this;
 	}
 	
-	public	function getDistInfo($username = false, $flags = [])
+	public	function getDistInfo($username = false, $flags = [], $qv = false)
 	{
 		$this->setDistId($username);
 		$user	=	$this->getDist($this->distid, $flags)->user;
@@ -74,6 +122,9 @@ class User extends \Greystar\Model
 		
 		if(empty($user))
 			return $user;
+		
+		$volume	=	(new \Greystar\User\Volume($username))->getVolume()->getData();
+		
 		$new	=	[];
 		foreach($user as $key => $value) {
 			if(preg_match('/^user/', $key) || in_array($key, ['internal_id','join_date','highest_achieved_rank','current_rank','avatar','first_name','last_name','full_name','member_type','email_address','night_phone','cell_phone'])) {
@@ -94,7 +145,13 @@ class User extends \Greystar\Model
 			elseif(preg_match('/^autoship_/', $key)) {
 				
 				$new['autoship']	=	true;
-			}
+			}/*
+			elseif(preg_match('/_qv/', $key)) {
+				if(stripos($key, 'left') !== false)
+					$new['volume']['leg_left'][$key]	=	$value;
+				else
+					$new['volume']['leg_right'][$key]	=	$value;
+			}*/
 			else
 				$new['general'][$key]	=	$value;
 		}
@@ -104,6 +161,15 @@ class User extends \Greystar\Model
 		}
 		
 		ksort($new);
+		$new['volume']						=	(!empty($new['volume']))? array_merge($new['volume'], $volume) : [];
+		$new['volume']['leg_left']			=	(isset($volume['leg_left']))? $volume['leg_left'] : 0;
+		$new['volume']['leg_right']			=	(isset($volume['leg_right']))? $volume['leg_right'] : 0;
+		$new['volume']['leg_left']['QV']	=	(isset($user['left_qv']))? $user['left_qv'] : 0;
+		$new['volume']['leg_right']['QV']	=	(isset($user['right_qv']))? $user['right_qv'] : 0;
+		$new['autoship']['active']			=	(!empty($volume['autoship_activated']))? $volume['autoship_activated'] : false;
+		$new['general']['sponsor']			=	(!empty($volume['sponsor_id']))? $volume['sponsor_id'] : false;
+		
+		unset($new['volume']['active'], $new['volume']['autoship_activated'], $new['volume']['rank'], $new['volume']['sponsor_id']);
 		
 		return $new;
 	}
@@ -111,14 +177,23 @@ class User extends \Greystar\Model
 	public	function getAvatar($username=false)
 	{
 		$this->setDistId($username);
-		$arr	=	$this->getUserValue('user',$this->distid);
+		
+		if(empty($this->raw_user))
+			$this->getDist($username);
+		
+		$arr	=	$this->getRawUserArray('/avatar/');
+		
 		return (!empty($arr['avatar']))? $arr['avatar'] : false;
 	}
 	
 	public	function getDistType($username=false)
 	{
 		$this->setDistId($username);
-		$arr	=	$this->getUserValue('user', $this->distid);
+		
+		if(empty($this->raw_user))
+			$this->getDist($username);
+		
+		$arr	=	$this->getRawUserArray('/member_type/');
 		return (!empty($arr['member_type']))? $arr['member_type'] : false;
 	}
 	
@@ -156,6 +231,20 @@ class User extends \Greystar\Model
 		}
 	}
 	
+	public	function getRawUserArray($pattern, $username=false)
+	{
+		$this->setDistId($username);
+		
+		$data	=	(empty($this->raw_user) && !empty($this->distid))? $this->getDist($this->distid)->raw_user : $this->raw_user;
+		$store	=	[];
+		foreach($data as $key => $value) {
+			if(preg_match($pattern, $key))
+				$store[$key]	=	$value;
+		}
+		
+		return $store;
+	}
+	
 	public	function getUserArray($pattern,$username=false)
 	{
 		$this->setDistId($username);
@@ -171,5 +260,44 @@ class User extends \Greystar\Model
 		}
 		
 		return $store;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getRankScore($username=false, $realrank = false)
+	{
+		$this->setDistId($username);
+		
+		if(empty($this->user) && !empty($this->distid))
+			$this->getDist($this->distid);
+		
+		$key	=	($realrank)? 'current_rank' : 'highest_achieved_rank';
+		$data	=	$this->getUserArray('/'.$key.'/');
+		
+		if(empty($data[$key]))
+			return false;
+		
+		return $this->getRankNumberFromList($data[$key]);
+	}
+	/**
+	 *	@description	
+	 */
+	public	function formatRankName($rank)
+	{
+		return str_replace(' ','_', strtolower($rank));
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getRankNumberFromList($rank)
+	{
+		return array_search($this->formatRankName($rank), $this->ranks_list)+1;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getRankNameFromList($number)
+	{
+		return (isset($this->ranks_list[$number-1]))? ucwords(str_replace('_', ' ', $this->ranks_list[$number-1])) : false;
 	}
 }

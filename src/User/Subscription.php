@@ -60,4 +60,37 @@ class Subscription extends \Greystar\User
 		$arr	=	$this->get($distid);
 		return (isset($arr[0]['no_autoship']))? false : true;
 	}
+	/**
+	 *	@description	
+	 */
+	public	function saveCreditCard($distid, $data)
+	{
+		foreach($data as $key => $value) {
+			$data[$key]	=	trim($value);
+		}
+		
+		$addr1		=	(!empty($data['addr1']))? $data['address'] : false;
+		$city		=	(!empty($data['city']))? $data['city'] : false;
+		$country	=	(!empty($data['country']))? $data['country'] : false;
+		$name		=	(!empty($data['name']))? $data['name'] : false;
+		$ccnum		=	(!empty($data['number']))? $data['number'] : false;
+			
+		if(count(array_filter([$addr1, $city, $country, $name, $ccnum, $distid])) != 6) {
+			self::$error['save_cc']	=	'Missing a required field (Address, City, Country, Name, CC Number, Customer ID).';
+			return false;
+		}
+		
+		$array	=	[
+			'ccaddr' => $addr1,
+			'ccaddr2' => (!empty($data['addr2']))? $data['address'] : false,
+			'cccity' => $city,
+			'cccountry' => $country,
+			'ccemail' => (!empty($data['email']) && filter_var($data['email'], FILTER_VALIDATE_EMAIL))? $data['email'] : false,
+			'ccname' => $name,
+			'ccno' => $ccnum,
+			'distid' => $distid,
+		];
+		
+		return $this->autoshipcreditcard($array);
+	}
 }

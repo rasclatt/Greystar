@@ -155,7 +155,7 @@ class Reports extends \Greystar\Model
 					$cvals	=	count($value);
 				}
 				if($count > $cvals) {
-					$ccount	=	($count-$vals);
+					$ccount	=	($count-$cvals);
 					for($i = 0; $i < $ccount; $i++) {
 						$value[]	=	'';
 					}
@@ -163,6 +163,11 @@ class Reports extends \Greystar\Model
 				else {
 					if(empty(array_filter($value)))
 						continue;
+				}
+				
+				if(count($keys) != count($value)) {
+					//echo(printpre([$keys,$value]));
+					continue;
 				}
 				
 				$anon[]	=	array_combine($keys,$value);

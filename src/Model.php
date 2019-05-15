@@ -71,7 +71,12 @@ class Model extends \Nubersoft\nApp
 		if(!empty($query))
 			$this->statement	=	$query;
 		# Send for content
-		return file_get_contents($this->statement);
+		$data	=	file_get_contents($this->statement);
+		
+		if($data === false)
+			trigger_error("An error occurred. If error persists, please contact customer support.");
+		
+		return $data;
 	}
 	/**
 	 *	@description	Return all the query attributes for the current call

@@ -10,7 +10,8 @@ class Controller extends \Greystar\Products
 	 */
 	public	function getRetailProducts($co = 'US')
 	{
-		return $this->getProductsByCategory('Retail Shopping Cart', $co);
+		$category	=	'Retail Shopping Cart';
+		return $this->getProductsByCategory($category, $co);
 	}
 	/**
 	 *	@description	

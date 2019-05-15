@@ -22,7 +22,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	
 	 */
-	public	function createWithAutoShip(array $array, array $products)
+	public	function createWithAutoShip(array $array, array $products, $discount = 0, $shipping = 0)
 	{
 		$settings	=	[
 			'amount' => $array['amount'],
@@ -90,12 +90,19 @@ class Model extends \Greystar\Model
 			return false;
 		}
 		else {
-			# Set as paid
-			$this->modifyinvoice([
+			$final_order	=	[
 				'username' => $settings['distid'],
-				'paid' => 'Y',
-				'inv' => $charge['Invoice']
-			]);
+				'inv' => $charge['Invoice'],
+				'paid' => 'Y'
+			];
+			// Add the discount to the order
+			if($discount > 0) {
+				$final_order['product1']	=	'justbv';
+				$final_order['qty1']		=	1;
+				$final_order['alterprice1']	=	"-".($discount-$shipping);
+			}
+			# Set as paid
+			$this->modifyinvoice($final_order);
 			# Store
 			$this->toSuccess("Transaction Successful–Thank you for your order!");
 			foreach($charge as $key => $value) {

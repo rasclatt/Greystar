@@ -22,7 +22,7 @@ class Subscription extends \Greystar\Products
 		}
 		
 		$array['distid']	=	$username;
-		
-		return $this->autoshipproducts($array);
+
+		return $this->doService(['autoshipproducts', 'logonly'], $array);
 	}
 }
