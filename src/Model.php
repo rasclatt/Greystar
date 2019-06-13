@@ -71,7 +71,7 @@ class Model extends \Nubersoft\nApp
 		if(!empty($query))
 			$this->statement	=	$query;
 		# Send for content
-		$data	=	file_get_contents($this->statement);
+		$data	=	@file_get_contents($this->statement);
 		
 		if($data === false)
 			trigger_error("An error occurred. If error persists, please contact customer support.");
