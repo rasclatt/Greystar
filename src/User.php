@@ -9,21 +9,24 @@ class User extends \Greystar\Model
 			$flags;
 	
 	private	$ranks_list	=	[
-		'promoter',
-		'active_promoter',
-		'qualified_promoter',
-		'promoter_500',
-		'promoter_1k',
-		'executive',
-		'senior_executive',
-		'managing_executive',
-		'director',
-		'regional_director',
-		'national_director',
-		'global_director',
-		'global_diamond',
-		'global_presidential',
-		'global_ambassador'
+		'1_star_vip',
+		'2_star_vip',
+		'3_star_vip',
+		'4_star_vip',
+		'influencer',
+		'platinum_influencer',
+		'executive_influencer',
+		'global_influencer',
+		'ambassador',
+		'platinum_ambassador',
+		'executive_ambassador',
+		'presidential_ambassador',
+		'crown_ambassador',
+		'chairman',
+		'plantinum_chairman',
+		'executive_chairman',
+		'presidential_chairman',
+		'crown_chairman'
 	];
 	
 	protected	$types	=	[
@@ -285,6 +288,14 @@ class User extends \Greystar\Model
 	public	function formatRankName($rank)
 	{
 		return str_replace(' ','_', strtolower($rank));
+	}
+	/**
+	 *	@description	
+	 */
+	public	function setCustomRankList(array $arr)
+	{
+		$this->ranks_list	=	$array;
+		return $this;
 	}
 	/**
 	 *	@description	

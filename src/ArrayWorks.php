@@ -17,6 +17,12 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 			}
 			
 			foreach($array as $key => $row) {
+				if(!is_array($keys) || !is_array($row))
+					continue;
+				
+				if(count($row) != count($row))
+					continue;
+				
 				$new[]	=	array_combine($keys,$row);
 			}
 

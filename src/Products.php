@@ -19,6 +19,8 @@ class Products extends \Greystar\Model
 		$strlower	=	['hard_coded_tax','hard_coded_shipping'];
 		# Loop through the main array
 		foreach($data as $key => $item) {
+			if(!is_array($item))
+				continue;
 			# Loop through each key/value and process each line if required
 			foreach($item as $kVal => $value) {
 				# Trim any white space

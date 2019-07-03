@@ -75,8 +75,6 @@ class Model extends \Greystar\Model
 		
 		self::$order['raw']			=	$settings;
 		
-		if($this->userGet('distid') == 275418) {
-		}
 		# Create Autoship
 		$ascreate			=	$this->doService(['creditcardstore','createautoship'], $settings);
 		$settings['inv']	=	$array['inv'];
@@ -90,19 +88,13 @@ class Model extends \Greystar\Model
 			return false;
 		}
 		else {
-			$final_order	=	[
-				'username' => $settings['distid'],
-				'inv' => $charge['Invoice'],
-				'paid' => 'Y'
-			];
-			// Add the discount to the order
-			if($discount > 0) {
-				$final_order['product1']	=	'justbv';
-				$final_order['qty1']		=	1;
-				$final_order['alterprice1']	=	"-".($discount-$shipping);
-			}
-			# Set as paid
-			$this->modifyinvoice($final_order);
+			# Set the next run date for the autoship
+			$this->autoshipdatechange([
+				'nextcharge'=> date('Y-m-d', strtotime("next Friday + 4 weeks")),
+				'distid' => $settings['distid']
+			]);
+			# Mark as paid and and add the discount
+			$this->markPaidWithDiscount($settings['distid'], $charge['Invoice'], $discount);
 			# Store
 			$this->toSuccess("Transaction Successful–Thank you for your order!");
 			foreach($charge as $key => $value) {
@@ -110,6 +102,29 @@ class Model extends \Greystar\Model
 			}
 			return $success;
 		}
+	}
+	/**
+	 *	@description	Marks an invoice as paid and adds a discount item if set
+	 */
+	public	function markPaidWithDiscount($distid, $invoice, $discount, $alterbv = true)
+	{
+		# Set the final paramerters for marking paid
+		$order	=	[
+			'username' => $distid,
+			'inv' => $invoice,
+			'paid' => 'Y'
+		];
+		# Add the discount to the order
+		if($discount > 0) {
+			$order['product1']		=	'justbv';
+			$order['qty1']			=	1;
+			$order['alterprice1']	=	"-".$discount;
+			# Add a negative BV if bv to be altered
+			if($alterbv)
+				$order['alterbv1']	=	"-".$finDiscount;
+		}
+		# Set as paid
+		return $this->modifyinvoice($order);
 	}
 	
 	public	function markInvoicePaid($inv, $paid = true, $type = false)
