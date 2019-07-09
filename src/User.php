@@ -311,4 +311,13 @@ class User extends \Greystar\Model
 	{
 		return (isset($this->ranks_list[$number-1]))? ucwords(str_replace('_', ' ', $this->ranks_list[$number-1])) : false;
 	}
+	/**
+	 *	@description	
+	 */
+	public	function getRankNameList($beauty = true)
+	{
+		return ($beauty)? array_map(function($v){
+			return ucwords(str_replace('_', ' ', $v));
+		}, $this->ranks_list) : $this->ranks_list;
+	}
 }
