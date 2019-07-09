@@ -23,7 +23,7 @@ class User extends \Greystar\Model
 		'presidential_ambassador',
 		'crown_ambassador',
 		'chairman',
-		'plantinum_chairman',
+		'platinum_chairman',
 		'executive_chairman',
 		'presidential_chairman',
 		'crown_chairman'
