@@ -11,13 +11,56 @@ class Model extends \Greystar\Model
 		$this->distid	=	$distid;
 	}
 	/**
-	 *	@description	
+	 *	@description	Creates an invoice
 	 */
 	public	function create(array $input)
 	{
+		# Scrubs shipping and billing keys of "ing" incase they are set as such
+		$this->cleanKeys($input);
+		# Set the raw form data
 		self::$order['raw']			=	$input;
+		# Create and set response
 		self::$order['response']	=	$this->invoice($input);
+		# Send back for chaining
 		return $this;
+	}
+	/**
+	 *	@description	Scrubs shipping and billing keys of "ing" incase they are set as such
+	 */
+	public	function cleanKeys(&$array)
+	{
+		if(!is_array($array))
+			return $array;
+		
+		$new	=	[];
+		foreach($array as $key => $value) {
+			
+			if(stripos($key, 'billing') !== false) {
+				$new[str_replace('billing', 'bill', $key)]	=	$value;
+			}
+			elseif(stripos($key, 'shipping') !== false) {
+				$new[str_replace('shipping', 'ship', $key)]	=	$value;
+			}
+			else
+				$new[$key]	=	$value;
+		}
+		$array	=	$new;
+		return $this;
+	}
+	/**
+	 *	@description	Returns values from an array if set
+	 */
+	public	function getArrayValue($array, $key, $default = false)
+	{
+		if(!is_array($key))
+			$key	=	[$key];
+		
+		foreach($key as $k) {
+			if(isset($array[$k]))
+				return $array[$k];
+		}
+		
+		return $default;
 	}
 	/**
 	 *	@description	
@@ -25,21 +68,21 @@ class Model extends \Greystar\Model
 	public	function createWithAutoShip(array $array, array $products, $discount = 0, $shipping = 0)
 	{
 		$settings	=	[
-			'amount' => $array['amount'],
-			'billaddress1' => $array['ccaddr'],
-			'billaddress2' => (!empty($array['ccaddr2']))? $array['ccaddr2'] : false,
-			'billcity' => $array['cccity'],
-			'billcountry' => $array['cccountry'],
-			'billstate' => $array['ccstate'],
-			'billzip' => $array['cczip'],
-			'billphone' => $array['ccphone'],
-			'ccaddr' => $array['ccaddr'],
-			'ccaddr2' => (!empty($array['ccaddr2']))? $array['ccaddr2'] : false,
-			'cccity' => $array['cccity'],
-			'cccountry' => $array['cccountry'],
-			'ccexpmo' => $array['ccexpmo'],
-			'ccexpyr' => $array['ccexpyr'],
-			'ccexp' => $array['ccexpmo'].$array['ccexpyr'],
+			'amount' => $this->getArrayValue($array, 'amount'),
+			'billaddress1' => $this->getArrayValue($array, ['billaddress1', 'ccaddr']),
+			'billaddress2' => $this->getArrayValue($array, ['billaddress2','ccaddr2']),
+			'billcity' => $this->getArrayValue($array, ['billcity','cccity']),
+			'billcountry' => $this->getArrayValue($array, ['billcountry','cccountry']),
+			'billstate' => $this->getArrayValue($array, ['billstate','ccstate']),
+			'billzip' => $this->getArrayValue($array, ['billzip','cczip']),
+			'billphone' => $this->getArrayValue($array, ['billphone','ccphone']),
+			'ccaddr' => $this->getArrayValue($array, 'ccaddr'),
+			'ccaddr2' => $this->getArrayValue($array, 'ccaddr2'),
+			'cccity' => $this->getArrayValue($array, 'cccity'),
+			'cccountry' => $this->getArrayValue($array, 'cccountry'),
+			'ccexpmo' => $this->getArrayValue($array, 'ccexpmo'),
+			'ccexpyr' => $this->getArrayValue($array, 'ccexpyr'),
+			'ccexp' => $this->getArrayValue($array, 'ccexpmo').$this->getArrayValue($array, 'ccexpyr'),
 			'ccname' => $array['ccname'],
 			'ccno' => $array['ccno'],
 			'ccstate' => $array['ccstate'],
@@ -106,6 +149,39 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	Marks an invoice as paid and adds a discount item if set
 	 */
+	public	function markPaidWithDiscountedItems($distid, $invoice, $discount)
+	{
+		$rawOrder	=	$this->getInvoice(['inv' => $invoice, 'username' => $distid]);
+		
+		# Set the final paramerters for marking paid
+		$order	=	[
+			'username' => $distid,
+			'inv' => $invoice,
+			'paid' => 'Y'
+		];
+		
+		$prod	=	[];
+		foreach($rawOrder['products'] as $products) {
+			
+		}
+		# Add the discount to the order
+		if($discount > 0) {
+			$order['product1']		=	'justbv';
+			$order['qty1']			=	1;
+			$order['alterprice1']	=	"-".$discount;
+			# Add a negative BV if bv to be altered
+			if($alterbv)
+				$order['alterbv1']	=	"-".$discount;
+		}
+		//if($distid == 275025) {
+		//	die(printpre($order,['backtrace'=>false]));
+		//}
+		# Set as paid
+		return $this->modifyinvoice($order);
+	}
+	/**
+	 *	@description	Marks an invoice as paid and adds a discount item if set
+	 */
 	public	function markPaidWithDiscount($distid, $invoice, $discount, $alterbv = true)
 	{
 		# Set the final paramerters for marking paid
@@ -121,8 +197,13 @@ class Model extends \Greystar\Model
 			$order['alterprice1']	=	"-".$discount;
 			# Add a negative BV if bv to be altered
 			if($alterbv)
-				$order['alterbv1']	=	"-".$finDiscount;
+				$order['alterbv1']	=	"-".$discount;
 		}
+		
+		//if($distid == 275025) {
+		//	die(printpre($order,['backtrace'=>false]));
+		//}
+		
 		# Set as paid
 		return $this->modifyinvoice($order);
 	}
@@ -173,7 +254,7 @@ class Model extends \Greystar\Model
 		else
 			$array['username']	=	$this->distid;
 		
-		if(empty($array['username'])) {
+		if(empty($array['username'])) { echo printpre();
 			trigger_error('Username/Distributor Id is required.');
 			return false;
 		}
@@ -221,5 +302,13 @@ class Model extends \Greystar\Model
 			return (isset(self::$order[$type]))? self::$order[$type] : false;
 		
 		return self::$order;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function hasPurchased($sku)
+	{
+		$data	=	$this->hasproduct(['distid' => $this->distid, 'product' => $sku]);
+		return key($data) == 'yes';
 	}
 }

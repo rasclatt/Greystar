@@ -6,6 +6,7 @@ class Model extends \Nubersoft\nApp
 	private	$statement,
 			$endpoint,
 			$settings;
+	private	static	$args;
 	
 	protected	static	$error	=	[];
 	/**
@@ -61,6 +62,13 @@ class Model extends \Nubersoft\nApp
 		return $this;
 	}
 	/**
+	 *	@description	
+	 */
+	public	function getStatement()
+	{
+		return $this->statement;
+	}
+	/**
 	 *	@description	Sends the query to Greystar
 	 *	@param	$query	[string|false]	If populated, will use this as the string to fetch content from GS
 	 *	@returns	Data respomse from GS
@@ -103,6 +111,7 @@ class Model extends \Nubersoft\nApp
 		# Create string from array for a multi-action service
 		if(is_array($service))
 			$service	=	implode(',', $service);
+		self::$args	=	$params;
 		# Fetch the contents from GS
 		$contents	=	$this->createConnection($service, $params, $func)->sendQuery();
 		# Stop if nothing is returned
@@ -249,5 +258,12 @@ class Model extends \Nubersoft\nApp
 		ksort($data);
 		
 		return $data;
+	}
+	/**
+	 *	@description	
+	 */
+	public	static	function getCallArgs()
+	{
+		return self::$args;
 	}
 }

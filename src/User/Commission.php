@@ -9,6 +9,13 @@ class Commission extends \Greystar\User\Controller
 			$from,
 			$to;
 	
+	protected $distid;
+	
+	public	function __construct($distid)
+	{
+		$this->distid	=	$distid;
+	}
+	
 	public	function setData($data)
 	{
 		$this->data	=	$data;

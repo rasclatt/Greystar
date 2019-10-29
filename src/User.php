@@ -5,8 +5,9 @@ use \Greystar\User\Subscription;
 
 class User extends \Greystar\Model
 {
-	private	$protected,
-			$flags;
+	protected	$protected,
+				$flags,
+				$distid;
 	
 	private	$ranks_list	=	[
 		'1_star_vip',
@@ -46,8 +47,7 @@ class User extends \Greystar\Model
 	
 	protected	function setDistId($username)
 	{
-		if(!empty($username))
-			$this->distid	=	trim($username);
+		$this->distid	=	(!empty($username))? trim($username) : false;
 		
 		return $this;
 	}
@@ -114,22 +114,25 @@ class User extends \Greystar\Model
 		
 		return $this;
 	}
-	
-	public	function getDistInfo($username = false, $flags = [], $qv = false)
+	/**
+	 *	@description	
+	 */
+	public	function getAll($sort = true)
 	{
-		$this->setDistId($username);
-		$user	=	$this->getDist($this->distid, $flags)->user;
-		$user	=	(!empty($user))? array_combine(array_map(function($v){
-			return rtrim($v, ':');
-		}, array_keys($user)), $user) : [];
+		if(empty($this->raw_user))
+			$this->getDist();
 		
-		if(empty($user))
-			return $user;
-		
-		$volume	=	(new \Greystar\User\Volume($username))->getVolume()->getData();
-		
+		return ($sort)? $this->sortUserData() : $this->raw_user;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function sortUserData($array=false)
+	{
 		$new	=	[];
-		foreach($user as $key => $value) {
+		$array	=	(is_array($array))? $array : $this->raw_user;
+			
+		foreach($array as $key => $value) {
 			if(preg_match('/^user/', $key) || in_array($key, ['internal_id','join_date','highest_achieved_rank','current_rank','avatar','first_name','last_name','full_name','member_type','email_address','night_phone','cell_phone'])) {
 				if($key == 'internal_id')
 					$new['user']['distid']	=	$value;
@@ -159,10 +162,31 @@ class User extends \Greystar\Model
 				$new['general'][$key]	=	$value;
 		}
 		
-		if(!empty($new['autoship'])) {
+		ksort($new);
+		
+		return $new;
+	}
+	public	function getDistInfo($username = false, $flags = [], $skip_as = false, $skip_vol = false)
+	{
+		$this->setDistId($username);
+		$user	=	$this->getDist($this->distid, $flags)->user;
+		$user	=	(!empty($user))? array_combine(array_map(function($v){
+			return rtrim($v, ':');
+		}, array_keys($user)), $user) : [];
+		
+		if(empty($user))
+			return $user;
+		
+		$new	=	$this->sortUserData($user);
+		
+		if(!empty($new['autoship']) && !$skip_as) {
 			$new['autoship']	=	(new Subscription())->get($this->distid);
 		}
 		
+		if($skip_vol)
+			return $new;
+			
+		$volume	=	(new \Greystar\User\Volume($this->distid))->getVolume()->getData();
 		ksort($new);
 		$new['volume']						=	(!empty($new['volume']))? array_merge($new['volume'], $volume) : [];
 		$new['volume']['leg_left']			=	(isset($volume['leg_left']))? $volume['leg_left'] : 0;
@@ -319,5 +343,27 @@ class User extends \Greystar\Model
 		return ($beauty)? array_map(function($v){
 			return ucwords(str_replace('_', ' ', $v));
 		}, $this->ranks_list) : $this->ranks_list;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getDistId()
+	{
+		return $this->distid;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function __call($method, $args=false)
+	{
+		$var	=	strtolower(implode('_',preg_split('/(?=[A-Z])/', preg_replace('/^get/','', $method), -1, PREG_SPLIT_NO_EMPTY)));
+		
+		if($var == 'data')
+			return $this->user;
+		
+		if(isset($this->user[$var]))
+			return $this->user[$var];
+		
+		return parent::__call($method, $args);
 	}
 }

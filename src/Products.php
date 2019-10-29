@@ -57,7 +57,7 @@ class Products extends \Greystar\Model
 		return $data;
 	}
 	
-	public	function getProductsByCategory($category, $co)
+	public	function getProductsByCategory($category, $co, $func = false)
 	{
 		$array	=	[
 		  'category' => $category,
@@ -80,6 +80,37 @@ class Products extends \Greystar\Model
 			$new[$arr['code']]	=	$arr;
 		}
 		
-		return $new;
+		return (is_callable($func))? $func($new) : $new;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getCategories()
+	{
+		$array	=	[
+		  'category' => '',
+		  'country' => '',
+		  'product' => '',
+		  'returntype' => '',
+		];
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getProductsBySku($sku, $attr = false)
+	{
+		if(!is_array($sku)) {
+			$sku	=	[$sku];
+		}
+		$products	=	[];
+		foreach($sku as $itemcode) {
+			$args	=	(!empty($attr))? array_merge(['product' => $itemcode], $attr) : ['product' => $itemcode];
+			$prod	=	$this->getProductList($args);
+			if(empty($prod[0]))
+				continue;
+			$products[$itemcode]	=	$prod[0];
+		}
+		
+		return $products;
 	}
 }

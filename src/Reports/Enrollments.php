@@ -6,7 +6,16 @@ namespace Greystar\Reports;
 class Enrollments extends \Greystar\Reports
 {
 	private	$startdate,
-			$enddate;
+			$enddate,
+			$distid;
+	/**
+	 *	@description	
+	 */
+	public	function setDistId($distid)
+	{
+		$this->distid	=	$distid;
+		return $this;
+	}
 	/**
 	 *	@description	This will fetch today's date only
 	 */
@@ -43,11 +52,16 @@ class Enrollments extends \Greystar\Reports
 	{
 		$this->startdate	=	(!empty($start))? $start : date('Y-m').'-01';
 		$this->enddate		=	(!empty($end))? $end : date('Y-m-d');
-		
-		$report		=	$this->getReport('newusersfirstorder',[
+		$params	=	[
 			'startdate' => $this->startdate,
 			'enddate' => $this->enddate
-		],false, function() {
+		];
+		
+		if(!empty($this->distid)){
+			$params['username']	=	$this->distid;
+		}
+		
+		$report		=	$this->getReport('newusersfirstorder', $params, false, function() {
 			$args	=	func_get_args();
 			if(empty($args[0]))
 				return [];

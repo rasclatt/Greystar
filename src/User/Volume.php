@@ -5,6 +5,14 @@ namespace Greystar\User;
  */
 class Volume  extends \Greystar\User\Commission
 {
+	protected $distid;
+	/**
+	 *	@description	
+	 */
+	public	function __construct($distid)
+	{
+		$this->distid	=	$distid;
+	}
 	/**
 	 *	@description	
 	 */

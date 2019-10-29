@@ -5,6 +5,12 @@ namespace Greystar\User;
  */
 class Genealogy extends \Greystar\User
 {
+	protected	$distid;
+	
+	public	function __construct($distid = false)
+	{
+		$this->distid	=	$distid;
+	}
 	/**
 	 *	@description	
 	 */
@@ -23,16 +29,28 @@ class Genealogy extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function getUpline($distid)
+	public	function getUpline($distid = false)
 	{
-		return $this->enrupline(['username' => $distid]);
+		if(empty($distid))
+			$distid	=	$this->distid;
+		
+		$vals	=	array_values($this->enrupline(['username' => $distid]));
+		$c		=	count($vals)-1;
+		if(in_array($vals[$c], [3, 'beyond']))
+			$vals	=	array_reverse($vals);
+		
+		return $vals;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getSponsor($distid)
+	public	function getSponsor($distid = false)
 	{
-		$upline	=	$this->getUpline($distid);
-		return (!empty($upline[1]))? $upline[1] : false;
+		if(empty($distid))
+			$distid	=	$this->distid;
+		
+		$upline		=	array_values($this->getUpline($distid));
+		$sponsor	=	array_pop($upline);
+		return $sponsor;
 	}
 }
