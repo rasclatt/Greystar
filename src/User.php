@@ -354,6 +354,15 @@ class User extends \Greystar\Model
 	/**
 	 *	@description	
 	 */
+	public	function get($args = [])
+	{
+		$this->getDist($this->distid, $args);
+		
+		return $this->user;
+	}
+	/**
+	 *	@description	
+	 */
 	public	function __call($method, $args=false)
 	{
 		$var	=	strtolower(implode('_',preg_split('/(?=[A-Z])/', preg_replace('/^get/','', $method), -1, PREG_SPLIT_NO_EMPTY)));

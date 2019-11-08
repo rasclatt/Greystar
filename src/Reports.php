@@ -135,7 +135,7 @@ class Reports extends \Greystar\Model
 		if(empty($override)) {
 			$rows	=	explode(PHP_EOL, $html);
 			$rows	=	array_map(function($v){
-					return str_getcsv($v,"\t");
+					return str_getcsv($v, "\t");
 				}, $rows);
 
 			if(empty($rows))
