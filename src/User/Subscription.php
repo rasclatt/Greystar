@@ -11,7 +11,7 @@ class Subscription extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function get($distid)
+	public	function get($distid = false)
 	{
 		$array	=	[
 		  'distid' => $distid,
