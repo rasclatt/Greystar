@@ -145,7 +145,7 @@ class Model extends \Nubersoft\nApp
 							return $arr;
 						};
 						$DOM	=	new \DOMDocument();
-						$DOM->loadHTML($contents);
+						@$DOM->loadHTML($contents);
 						$rows	=	$DOM->getElementsByTagName('tr');
 						foreach ($rows as $node) {
 							$arr[]	=	 $parse($node->childNodes);
