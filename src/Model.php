@@ -81,8 +81,10 @@ class Model extends \Nubersoft\nApp
 		# Send for content
 		$data	=	@file_get_contents($this->statement);
 		
-		if($data === false)
-			trigger_error("An error occurred. If error persists, please contact customer support.");
+		if($data === false) {
+			throw new \Nubersoft\HttpException("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
+			//trigger_error("An error occurred. If error persists, please contact customer support.");
+		}
 		
 		return $data;
 	}
