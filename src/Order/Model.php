@@ -100,9 +100,14 @@ class Model extends \Greystar\Model
 			'shipzip' => $array['shipzip'],
 			'paid' => 'N'
 		];
+		$asorder	=	$settings;
 		$products	=	array_values($products);
 		$a	=	1;
 		foreach($products as $key => $product) {
+			if($a == 1) {		
+ 				$asorder['autoshipproduct'.$a]	=	$product['itemcode'];		
+ 				$asorder['autoshipq'.$a]		=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];		
+ 			}
 			$settings['product'.$a]	=	$product['itemcode'];
 			$settings['qty'.$a]		=
 			/*$settings['quantity'.$a]	=	*/(!empty($product['qty']))? $product['qty'] : $product['quantity'];
@@ -110,8 +115,9 @@ class Model extends \Greystar\Model
 			$a++;
 		}
 		self::$order['raw']		=	$settings;
+		
 		# Create Autoship
-		$ascreate			=	$this->doService(['autoshipcreditcard','createautoship'], $settings);
+		$ascreate			=	$this->doService(['autoshipcreditcard','createautoship'], $asorder);
 		$settings['inv']	=	$array['inv'];
 		# Create the invoice order
 		self::$order['response']	=	
