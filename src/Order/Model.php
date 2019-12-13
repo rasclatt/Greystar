@@ -100,30 +100,22 @@ class Model extends \Greystar\Model
 			'shipzip' => $array['shipzip'],
 			'paid' => 'N'
 		];
-		
 		$products	=	array_values($products);
 		$a	=	1;
 		foreach($products as $key => $product) {
-			if($a == 1) {
-				$settings['autoshipproduct'.$a]	=	$product['itemcode'];
-				$settings['autoshipq'.$a]		=	(!empty($product['qty']))? $product['qty'] : $product['quantity'];
-			}
-			
 			$settings['product'.$a]	=	$product['itemcode'];
 			$settings['qty'.$a]		=
 			/*$settings['quantity'.$a]	=	*/(!empty($product['qty']))? $product['qty'] : $product['quantity'];
 			
 			$a++;
 		}
-		
-		self::$order['raw']			=	$settings;
-		
+		self::$order['raw']		=	$settings;
 		# Create Autoship
-		$ascreate			=	$this->doService(['creditcardstore','createautoship'], $settings);
+		$ascreate			=	$this->doService(['autoshipcreditcard','createautoship'], $settings);
 		$settings['inv']	=	$array['inv'];
 		# Create the invoice order
 		self::$order['response']	=	
-		$charge	=	$this->doService(['creditcardcharge','invoice'], $settings);
+		$charge	=	$this->doService(['creditcardcharge'], $settings);
 		# Stop if fail
 		if(!empty($charge['error']) || (!empty($charge['result']) && stripos($charge['result'], 'fail') !== false)) {
 			$this->doService('deleteautoship', ['distid' => $this->userGet('distid')]);
@@ -131,16 +123,17 @@ class Model extends \Greystar\Model
 			return false;
 		}
 		else {
+			$settings['invoice']	=	$settings['inv'];
 			# Set the next run date for the autoship
 			$this->autoshipdatechange([
 				'nextcharge'=> date('Y-m-d', strtotime("next Friday + 4 weeks")),
 				'distid' => $settings['distid']
 			]);
 			# Mark as paid and and add the discount
-			$this->markPaidWithDiscount($settings['distid'], $charge['Invoice'], $discount);
+			$this->markPaidWithDiscount($settings['distid'], $settings['inv'], $discount);
 			# Store
 			$this->toSuccess("Transaction Successful–Thank you for your order!");
-			foreach($charge as $key => $value) {
+			foreach($settings as $key => $value) {
 				$success[strtolower(str_replace([' '],['_'], $key))]	=	ltrim($value, '$');
 			}
 			return $success;
