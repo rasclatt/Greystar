@@ -36,7 +36,7 @@ class Genealogy extends \Greystar\User
 		
 		$vals	=	array_values($this->enrupline(['username' => $distid]));
 		$c		=	count($vals)-1;
-		if(in_array($vals[$c], [3, 'beyond']))
+		if(isset($vals[$c]) && in_array($vals[$c], [3, 'beyond']))
 			$vals	=	array_reverse($vals);
 		
 		return $vals;

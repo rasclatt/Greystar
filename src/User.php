@@ -35,8 +35,8 @@ class User extends \Greystar\Model
 		'C'=> 'Preferred',
 		'R' => 'Retail'
 	];
-	protected	$raw_user	=	[];
-	protected	$user		=	[];
+	protected	$raw_user		=	[];
+	protected	static	$user	=	[];
 	/**
 	 *	@description	
 	 */
@@ -47,11 +47,11 @@ class User extends \Greystar\Model
 	
 	protected	function setDistId($username)
 	{
-		$this->distid	=	(!empty($username))? trim($username) : false;
+		if(!empty($username))
+			$this->distid	=	trim($username);
 		
 		return $this;
 	}
-	
 	/**
 	*	@description	Check and filter username to allow only a-z0-9
 	*/
@@ -78,8 +78,8 @@ class User extends \Greystar\Model
 	*/
 	public	function isSuspended($username = false)
 	{
-		if(!empty($this->user['general']['status']))
-			$status['status']	=	$this->user['general']['status'];
+		if(!empty(self::$user['general']['status']))
+			$status['status']	=	self::$user['general']['status'];
 		else {
 			$this->setDistId($username);
 			$status	=	$this->getDist($this->distid)->getUserArray('/status/i');
@@ -97,6 +97,9 @@ class User extends \Greystar\Model
 	
 	public	function getDist($username=false, $flags=[], $qv = false)
 	{
+		if($username)
+			$this->clear();
+		
 		if(empty($flags) && !empty($this->flags))
 			$flags	=	$this->flags;
 		
@@ -104,13 +107,16 @@ class User extends \Greystar\Model
 		
 		if(empty($this->distid))
 			return $this;
-		$this->raw_user	=
-		$this->user	=	$this->getuserdata(array_merge([
-			'distid' => $this->distid,
-			'returntype' => 'all',
-			'showqv' => (!empty($qv))? $qv : date('Y-m-d'),
-			'includeflags' => 'all'
-		],$flags));
+		
+		if(empty(self::$user)) {
+			$this->raw_user	=
+			self::$user	=	$this->getuserdata(array_merge([
+				'distid' => $this->distid,
+				'returntype' => 'all',
+				'showqv' => (!empty($qv))? $qv : date('Y-m-d'),
+				'includeflags' => 'all'
+			],$flags));
+		}
 		
 		return $this;
 	}
@@ -168,8 +174,11 @@ class User extends \Greystar\Model
 	}
 	public	function getDistInfo($username = false, $flags = [], $skip_as = false, $skip_vol = false)
 	{
+		if($username)
+			$this->clear();
+		
 		$this->setDistId($username);
-		$user	=	$this->getDist($this->distid, $flags)->user;
+		$user	=	$this->getDist($this->distid, $flags)->get();
 		$user	=	(!empty($user))? array_combine(array_map(function($v){
 			return rtrim($v, ':');
 		}, array_keys($user)), $user) : [];
@@ -228,8 +237,8 @@ class User extends \Greystar\Model
 	{
 		$this->setDistId($username);
 		
-		if(empty($this->user))
-			$this->user	=	$this->getDistInfo($this->distid);
+		if(empty(self::$user))
+			self::$user	=	$this->getDistInfo($this->distid);
 		
 		return $this->getUserValue('shipping', $this->distid);
 	}
@@ -238,8 +247,8 @@ class User extends \Greystar\Model
 	{
 		$this->setDistId($username);
 		
-		if(empty($this->user))
-			$this->user	=	$this->getDistInfo($this->distid);
+		if(empty(self::$user))
+			self::$user	=	$this->getDistInfo($this->distid);
 		
 		return $this->getUserValue('billing', $this->distid);
 	}
@@ -248,13 +257,13 @@ class User extends \Greystar\Model
 	{
 		$this->setDistId($username);
 		
-		if(!empty($this->user[$key]))
-			return $this->user[$key];
+		if(!empty(self::$user[$key]))
+			return self::$user[$key];
 		else {
 			if(!empty($this->distid))
-				$this->user	=	$this->getDistInfo($this->distid);
+				self::$user	=	$this->getDistInfo($this->distid);
 			
-			return (!empty($this->user[$key]))? $this->user[$key] : false;
+			return (!empty(self::$user[$key]))? self::$user[$key] : false;
 		}
 	}
 	
@@ -276,10 +285,10 @@ class User extends \Greystar\Model
 	{
 		$this->setDistId($username);
 		
-		if(empty($this->user) && !empty($this->distid))
+		if(empty(self::$user) && !empty($this->distid))
 			$data	=	$this->getDistInfo($this->distid);
 		else
-			$data	=	$this->user;
+			$data	=	self::$user;
 		$store	=	[];
 		foreach($data as $key => $value) {
 			if(preg_match($pattern,$key))
@@ -295,7 +304,7 @@ class User extends \Greystar\Model
 	{
 		$this->setDistId($username);
 		
-		if(empty($this->user) && !empty($this->distid))
+		if(empty(self::$user) && !empty($this->distid))
 			$this->getDist($this->distid);
 		
 		$key	=	($realrank)? 'current_rank' : 'highest_achieved_rank';
@@ -358,7 +367,15 @@ class User extends \Greystar\Model
 	{
 		$this->getDist($this->distid, $args);
 		
-		return $this->user;
+		return self::$user;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function clear()
+	{
+		self::$user	=	[];
+		return $this;
 	}
 	/**
 	 *	@description	
@@ -368,10 +385,10 @@ class User extends \Greystar\Model
 		$var	=	strtolower(implode('_',preg_split('/(?=[A-Z])/', preg_replace('/^get/','', $method), -1, PREG_SPLIT_NO_EMPTY)));
 		
 		if($var == 'data')
-			return $this->user;
+			return self::$user;
 		
-		if(isset($this->user[$var]))
-			return $this->user[$var];
+		if(isset(self::$user[$var]))
+			return self::$user[$var];
 		
 		return parent::__call($method, $args);
 	}
