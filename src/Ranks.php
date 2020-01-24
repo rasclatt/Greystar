@@ -15,7 +15,6 @@ class Ranks extends \Nubersoft\nApp
 			'name' => $name,
 			'volume' => $volume
 		];
-		return self;
 	}
 	/**
 	 *	@description	
