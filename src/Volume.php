@@ -30,7 +30,7 @@ class Volume extends Model
 		$info		=	$this->User->getDistInfo();
 		# Stop if no information available
 		if(empty($info['user']['current_rank']))
-			return false;
+			return $this;
 		# Set current rank
 		$currRank	=	$info['user']['current_rank'];
 		# Get the current rank of the user
@@ -42,7 +42,7 @@ class Volume extends Model
 		}, array_filter($data)) : false;
 		# Stop if nothing exists
 		if(empty($data))
-			return false;
+			return $this;
 		# Fetch the next rank from current
 		$nextRank	=	Ranks::getNextRank($currRank);
 		# Set the max allowed from enrollment tree leg
