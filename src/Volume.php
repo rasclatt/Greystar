@@ -31,6 +31,7 @@ class Volume extends Model
 		# Stop if no information available
 		if(empty($info['user']['current_rank']))
 			return $this;
+		
 		# Set current rank
 		$currRank	=	$info['user']['current_rank'];
 		# Get the current rank of the user
@@ -46,7 +47,7 @@ class Volume extends Model
 		# Fetch the next rank from current
 		$nextRank	=	Ranks::getNextRank($currRank);
 		# Set the max allowed from enrollment tree leg
-		$max		=	($nextRank['volume'] * $this->threshold);
+		$max		=	($currRank == 'Active Customer')? 60 : ($nextRank['volume'] * $this->threshold);
 		# Loop contributors and set the threshold
 		$data		=	array_map(function($v) use ($max){
 			return ($v > $max)? $max : $v;
@@ -60,10 +61,10 @@ class Volume extends Model
 			'base_volume' => array_sum($base),
 			'adjusted_list' => array_diff_assoc($data, $base),
 			'adjusted_volume' => $sum,
-			'percent_to_next' => $perc = round((($sum / $nextRank['volume']) * 100), 2),
-			'percent_left' => (100 - $perc),
-			'current_rank' => Ranks::getRank($info['user']['current_rank']),
-			'next_rank' => $nextRank,
+			'percent_to_next' => ($currRank == 'Active Customer')? $perc = 'NA' : $perc = round((($sum / $nextRank['volume']) * 100), 2),
+			'percent_left' => ($perc == 'NA')? $perc : (100 - $perc),
+			'current_rank' => ($perc == 'NA')? 'Active Customer' : Ranks::getRank($info['user']['current_rank']),
+			'next_rank' => ($perc == 'NA')? $perc : $nextRank,
 		];
 		return $this;
 	}
