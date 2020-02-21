@@ -3,10 +3,10 @@ namespace Greystar;
 
 class Model extends \Nubersoft\nApp
 {
-	private	$statement,
-			$endpoint,
-			$settings;
-	private	static	$args;
+	private		$statement, $settings;
+	private		static	$args;
+	protected	static	$endpoint;
+	protected	static	$creds;
 	
 	protected	static	$error	=	[];
 	/**
@@ -15,7 +15,7 @@ class Model extends \Nubersoft\nApp
 	 */
 	public	function setEndpoint($endpoint = false)
 	{
-		$this->endpoint	=	(!empty($endpoint))? $endpoint : GS_ENDPOINT;
+		self::$endpoint	=	(!empty($endpoint))? $endpoint : GS_ENDPOINT;
 		
 		return $this;
 	}
@@ -27,11 +27,13 @@ class Model extends \Nubersoft\nApp
 	 */
 	public	function init($apikey = false, $fromapi = false, $fromuser = false)
 	{
-		$this->settings	=	[
-			'appkey'=> (!empty($apikey))? $apikey : GS_APIKEY,
-			'fromapi'=> (!empty($fromapi))? $fromapi : GS_FROM_API,
-			'fromapiuser'=> (!empty($fromuser))? $fromuser : GS_FROM_API_USER
-		];
+		if(empty(self::$creds)) {
+			self::$creds	=	[
+				'appkey'=> (!empty($apikey))? $apikey : GS_APIKEY,
+				'fromapi'=> (!empty($fromapi))? $fromapi : GS_FROM_API,
+				'fromapiuser'=> (!empty($fromuser))? $fromuser : GS_FROM_API_USER
+			];
+		}
 		
 		return $this;
 	}
@@ -43,6 +45,7 @@ class Model extends \Nubersoft\nApp
 	 */
 	protected	function createConnection($service, $params=false, $func = false)
 	{
+		$this->settings	=	(is_array($this->settings))? array_merge(self::$creds, $this->settings) : self::$creds;
 		# Set the action
 		$this->settings['action']	=	$service;
 		# Combine the api credentials with any attributes to send
@@ -54,10 +57,10 @@ class Model extends \Nubersoft\nApp
 		# Build the query
 		$query	=	http_build_query($this->settings);
 		# Make sure the endpoint is set
-		if(empty($this->endpoint))
+		if(empty(self::$endpoint))
 			$this->setEndpoint();
 		# Set the endpoint url
-		$this->statement	=	$this->endpoint.'?'.$query;
+		$this->statement	=	self::$endpoint.'?'.$query;
 		# Chain
 		return $this;
 	}
