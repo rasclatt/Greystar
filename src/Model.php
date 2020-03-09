@@ -25,9 +25,9 @@ class Model extends \Nubersoft\nApp
 	 *	@param	$fromapi	[string|empty]	Set using string, default will call a define()
 	 *	@param	$fromuser	[string|empty]	Set using string, default will call a define()
 	 */
-	public	function init($apikey = false, $fromapi = false, $fromuser = false)
+	public	function init($apikey = false, $fromapi = false, $fromuser = false, $reset = false)
 	{
-		if(empty(self::$creds)) {
+		if(empty(self::$creds) || $reset) {
 			self::$creds	=	[
 				'appkey'=> (!empty($apikey))? $apikey : GS_APIKEY,
 				'fromapi'=> (!empty($fromapi))? $fromapi : GS_FROM_API,
