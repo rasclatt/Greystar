@@ -81,15 +81,42 @@ class Model extends \Nubersoft\nApp
 		# Allow for input directly to query
 		if(!empty($query))
 			$this->statement	=	$query;
-		# Send for content
-		$data	=	@file_get_contents($this->statement);
-		
-		if($data === false) {
+        # Send for content
+		$data =   $this->fetchMethod($this->statement);
+        # Stop if no data
+		if($data === false && !self::$suppress) {
 			throw new \Nubersoft\HttpException("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
 			//trigger_error("An error occurred. If error persists, please contact customer support.");
 		}
-		
 		return $data;
+	}
+	/**
+	 *	@description	
+	 */
+	protected	function fetchMethod($string, $type='curl', $obj = false)
+	{
+        if(is_object($obj)) {
+            $data = $obj->fetch($string);
+        }
+        elseif($type != 'curl') {
+            # Send for content
+            $data	=	@file_get_contents($this->statement);
+        }
+        else {
+            ob_start();
+            $ch = curl_init();
+            // set URL and other appropriate options
+            curl_setopt($ch, CURLOPT_URL, $this->statement);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            // grab URL and pass it to the browser
+            curl_exec($ch);
+            // close cURL resource, and free up system resources
+            curl_close($ch);
+            $data = ob_get_contents();
+            ob_end_clean();
+        }
+        
+        return $data;
 	}
 	/**
 	 *	@description	Return all the query attributes for the current call
