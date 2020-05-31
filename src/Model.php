@@ -103,17 +103,16 @@ class Model extends \Nubersoft\nApp
             $data	=	@file_get_contents($this->statement);
         }
         else {
-            ob_start();
             $ch = curl_init();
-            // set URL and other appropriate options
             curl_setopt($ch, CURLOPT_URL, $this->statement);
             curl_setopt($ch, CURLOPT_HEADER, 0);
-            // grab URL and pass it to the browser
-            curl_exec($ch);
-            // close cURL resource, and free up system resources
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+	        # Fetch remote
+            $data = curl_exec($ch);
             curl_close($ch);
-            $data = ob_get_contents();
-            ob_end_clean();
         }
         
         return $data;
