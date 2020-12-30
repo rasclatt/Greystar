@@ -1,22 +1,17 @@
 <?php
 namespace Greystar;
 
-class Model extends \Nubersoft\nApp
+class App extends \Nubersoft\nApp
 {
-	private		$statement, $settings;
-	private		static	$args;
-	protected	static	$endpoint;
-	protected	static	$creds;
-	
-	protected	static	$error	=	[];
+	protected $statement, $settings, $args, $endpoint, $creds;
+	protected static $error	=	[];
 	/**
 	 *	@description	Creates the endpoint
 	 *	@param	$endpoint	[string|empty]	Set using string, default will call a define()
 	 */
 	public	function setEndpoint($endpoint = false)
 	{
-		self::$endpoint	=	(!empty($endpoint))? $endpoint : GS_ENDPOINT;
-		
+		$this->endpoint	=	(!empty($endpoint))? $endpoint : GS_ENDPOINT;
 		return $this;
 	}
 	/**
@@ -27,8 +22,8 @@ class Model extends \Nubersoft\nApp
 	 */
 	public	function init($apikey = false, $fromapi = false, $fromuser = false, $reset = false)
 	{
-		if(empty(self::$creds) || $reset) {
-			self::$creds	=	[
+		if(empty($this->creds) || $reset) {
+			$this->creds	=	[
 				'appkey'=> (!empty($apikey))? $apikey : GS_APIKEY,
 				'fromapi'=> (!empty($fromapi))? $fromapi : GS_FROM_API,
 				'fromapiuser'=> (!empty($fromuser))? $fromuser : GS_FROM_API_USER
@@ -45,7 +40,7 @@ class Model extends \Nubersoft\nApp
 	 */
 	protected	function createConnection($service, $params=false, $func = false)
 	{
-		$this->settings	=	(is_array($this->settings))? array_merge(self::$creds, $this->settings) : self::$creds;
+		$this->settings	=	(is_array($this->settings))? array_merge($this->creds, $this->settings) : $this->creds;
 		# Set the action
 		$this->settings['action']	=	$service;
 		# Combine the api credentials with any attributes to send
@@ -57,10 +52,10 @@ class Model extends \Nubersoft\nApp
 		# Build the query
 		$query	=	http_build_query($this->settings);
 		# Make sure the endpoint is set
-		if(empty(self::$endpoint))
+		if(empty($this->endpoint))
 			$this->setEndpoint();
 		# Set the endpoint url
-		$this->statement	=	self::$endpoint.'?'.$query;
+		$this->statement	=	$this->endpoint.'?'.$query;
 		# Chain
 		return $this;
 	}
@@ -84,7 +79,7 @@ class Model extends \Nubersoft\nApp
         # Send for content
 		$data =   $this->fetchMethod($this->statement);
         # Stop if no data
-		if($data === false && !self::$suppress) {
+		if($data === false && !$this->suppress) {
 			throw new \Nubersoft\HttpException("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
 			//trigger_error("An error occurred. If error persists, please contact customer support.");
 		}
@@ -142,7 +137,7 @@ class Model extends \Nubersoft\nApp
 		# Create string from array for a multi-action service
 		if(is_array($service))
 			$service	=	implode(',', $service);
-		self::$args	=	$params;
+		$this->args	=	$params;
 		# Fetch the contents from GS
 		$contents	=	$this->createConnection($service, $params, $func)->sendQuery();
 		# Stop if nothing is returned
@@ -295,13 +290,13 @@ class Model extends \Nubersoft\nApp
 	 */
 	public	static	function getCallArgs()
 	{
-		return self::$args;
+		return $this->args;
 	}
 	/**
 	 *	@description	
 	 */
 	public function getCredentials()
 	{
-        return self::$creds;
+        return $this->creds;
 	}
 }
