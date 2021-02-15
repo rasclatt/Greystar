@@ -7,7 +7,8 @@ class Model extends \Nubersoft\nApp
 	private static $args;
 	protected static $endpoint;
 	protected static $creds;
-	protected static $error	= [];
+	
+	protected static $error	=	[];
 	/**
 	 *	@description	Creates the endpoint
 	 *	@param	$endpoint	[string|empty]	Set using string, default will call a define()
@@ -84,7 +85,7 @@ class Model extends \Nubersoft\nApp
 		$data =   $this->fetchMethod($this->statement);
         # Stop if no data
 		if($data === false) {
-			trigger_error("An error occurred. If error persists, please contact customer support.");
+			trigger_error("An error occurred. If error persists, please contact customer support.", E_USER_WARNING);
 			self::$error	=	true;
 		}
 		return $data;
@@ -189,7 +190,7 @@ class Model extends \Nubersoft\nApp
 							$arr	=	array_map(function($v) use ($cols){
 								$v	=	array_map(function($v){
 									$v	=	trim($v);
-									if($v == 'Â ')
+									if($v == 'Â ')
 										return '';
 
 									return $v;
