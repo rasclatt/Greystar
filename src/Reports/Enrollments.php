@@ -11,7 +11,7 @@ class Enrollments extends \Greystar\Reports
 	/**
 	 *	@description	
 	 */
-	public	function setDistId($distid)
+	public function setDistId($distid)
 	{
 		$this->distid	=	$distid;
 		return $this;
@@ -19,7 +19,7 @@ class Enrollments extends \Greystar\Reports
 	/**
 	 *	@description	This will fetch today's date only
 	 */
-	public	function getNew($date)
+	public function getNew($date)
 	{
 		$this->startdate	=	
 		$this->enddate		=	$date;
@@ -30,8 +30,7 @@ class Enrollments extends \Greystar\Reports
 			'startdate' => $date,
 			'enddate' => $date
 		],
-		false,
-		function() use($thisObj) {
+		false, function() use($thisObj) {
 			$args	=	func_get_args();
 			if(empty($args[0]))
 				return [];
@@ -48,7 +47,7 @@ class Enrollments extends \Greystar\Reports
 	/**
 	 *	@description	This will fetch a date range, default being first of the month to today
 	 */
-	public	function get($func = false, $start = false, $end = false)
+	public function get($func = false, $start = false, $end = false)
 	{
 		$this->startdate	=	(!empty($start))? $start : date('Y-m').'-01';
 		$this->enddate		=	(!empty($end))? $end : date('Y-m-d');
@@ -98,7 +97,7 @@ class Enrollments extends \Greystar\Reports
 	/**
 	 *	@description	
 	 */
-	public	function getDateRange()
+	public function getDateRange()
 	{
 		return [
 			'start' => $this->startdate,

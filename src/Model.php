@@ -3,17 +3,17 @@ namespace Greystar;
 
 class Model extends \Nubersoft\nApp
 {
-	private		$statement, $settings;
-	private		static	$args;
-	protected	static	$endpoint;
-	protected	static	$creds;
+	private $statement, $settings;
+	private static $args;
+	protected static $endpoint;
+	protected static $creds;
 	
-	protected	static	$error	=	[];
+	protected static $error	=	[];
 	/**
 	 *	@description	Creates the endpoint
 	 *	@param	$endpoint	[string|empty]	Set using string, default will call a define()
 	 */
-	public	function setEndpoint($endpoint = false)
+	public function setEndpoint($endpoint = false)
 	{
 		self::$endpoint	=	(!empty($endpoint))? $endpoint : GS_ENDPOINT;
 		
@@ -25,7 +25,7 @@ class Model extends \Nubersoft\nApp
 	 *	@param	$fromapi	[string|empty]	Set using string, default will call a define()
 	 *	@param	$fromuser	[string|empty]	Set using string, default will call a define()
 	 */
-	public	function init($apikey = false, $fromapi = false, $fromuser = false, $reset = false)
+	public function init($apikey = false, $fromapi = false, $fromuser = false, $reset = false)
 	{
 		if(empty(self::$creds) || $reset) {
 			self::$creds	=	[
@@ -43,7 +43,7 @@ class Model extends \Nubersoft\nApp
 	 *	@param	$params	[array|empty]	These are any key/values that need to be sent
 	 *	@param	$func	[callable|empty]	This can be a function that will process response
 	 */
-	protected	function createConnection($service, $params=false, $func = false)
+	protected function createConnection($service, $params=false, $func = false)
 	{
 		$this->settings	=	(is_array($this->settings))? array_merge(self::$creds, $this->settings) : self::$creds;
 		# Set the action
@@ -67,7 +67,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	function getStatement()
+	public function getStatement()
 	{
 		return $this->statement;
 	}
@@ -76,7 +76,7 @@ class Model extends \Nubersoft\nApp
 	 *	@param	$query	[string|false]	If populated, will use this as the string to fetch content from GS
 	 *	@returns	Data respomse from GS
 	 */
-	protected	function sendQuery($query = false)
+	protected function sendQuery($query = false)
 	{
 		# Allow for input directly to query
 		if(!empty($query))
@@ -84,8 +84,8 @@ class Model extends \Nubersoft\nApp
         # Send for content
 		$data =   $this->fetchMethod($this->statement);
         # Stop if no data
-		if($data === false && !self::$suppress) {
-			throw new \Nubersoft\HttpException("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
+		if($data === false) {
+			throw new \Exception("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
 			//trigger_error("An error occurred. If error persists, please contact customer support.");
 		}
 		return $data;
@@ -93,7 +93,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	protected	function fetchMethod($string, $type='curl', $obj = false)
+	protected function fetchMethod($string, $type='curl', $obj = false)
 	{
         if(is_object($obj)) {
             $data = $obj->fetch($string);
@@ -120,7 +120,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	Return all the query attributes for the current call
 	 */
-	public	function getAttrbutes($key = false)
+	public function getAttrbutes($key = false)
 	{
 		if(!empty($key))
 			return (isset($this->settings[$key]))? $this->settings[$key] : false;
@@ -133,7 +133,7 @@ class Model extends \Nubersoft\nApp
 	 *	@param	$params		[array|empty]	Send any parameters that the call requires
 	 *	@param	$func	[callable|empty]	Allow the data back to be processed with a custom function
 	 */
-	public	function doService($service, $params = false, $func = false, $start = true)
+	public function doService($service, $params = false, $func = false, $start = true)
 	{
 		# Set the initial credentials
 		# If set to false, it is assumed the init is being set before this service is called
@@ -169,7 +169,7 @@ class Model extends \Nubersoft\nApp
 					# Try to parse a <table> (not the best way to get data from GS)
 					if(empty($params['textonly'])) {
 						$arr	=	[];
-						$parse	=	function($child){
+						$parse	= function($child){
 							foreach ($child as $element) {
 								$arr[]	=	trim($element->nodeValue);
 							}
@@ -222,7 +222,7 @@ class Model extends \Nubersoft\nApp
 	 *	@description	Checks if errors came from the API response
 	 *	@param	$type	Allow ability to target specific error returns
 	 */
-	public	static	function hasErrors($type=false)
+	public static function hasErrors($type=false)
 	{
 		if(!empty($type)) {
 			$type	=	strtolower($type);
@@ -235,7 +235,7 @@ class Model extends \Nubersoft\nApp
 	 *	@description	Fetches errors from the API response
 	 *	@param	$type	Allow ability to target specific error returns
 	 */
-	public	static	function getErrors($type=false)
+	public static function getErrors($type=false)
 	{
 		if(!empty($type)) {
 			$type	=	strtolower($type);
@@ -247,7 +247,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	Dynamically call single action services
 	 */
-	public	function __call($name, $args = false)
+	public function __call($name, $args = false)
 	{
 		$params	=	false;
 		if(!empty($args))
@@ -270,7 +270,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	Dynamically call single action services staticly
 	 */
-	public	static	function __callStatic($name, $args=false)
+	public static function __callStatic($name, $args=false)
 	{
 		$params	=	false;
 		if(!empty($args))
@@ -293,7 +293,7 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function getCallArgs()
+	public static function getCallArgs()
 	{
 		return self::$args;
 	}

@@ -8,7 +8,7 @@ class Controller extends \Greystar\Order\Model
 	/**
 	 *	@description	
 	 */
-	public	function getThisMonth($username = false)
+	public function getThisMonth($username = false)
 	{
 		$data	=	[
 			'from'=>date('Y-m-d', strtotime('first day of this month')),

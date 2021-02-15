@@ -9,13 +9,13 @@ class Subscription extends \Greystar\Products
 	/**
 	 *	@description	
 	 */
-	public	function setDistId($distid)
+	public function setDistId($distid)
 	{
 		$this->distid	=	$distid;
 		
 		return $this;
 	}	
-	public	function update($username = false, $products = false)
+	public function update($username = false, $products = false)
 	{
 		if(!empty($username))
 			$this->distid	=	$username;
@@ -43,7 +43,7 @@ class Subscription extends \Greystar\Products
 	/**
 	 *	@description	
 	 */
-	public	function delete($distid = false)
+	public function delete($distid = false)
 	{
 		if(!empty($distid))
 			$this->distid	=	$distid;

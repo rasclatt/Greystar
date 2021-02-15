@@ -9,14 +9,14 @@ class Commission extends Model
 	/**
 	 *	@description	
 	 */
-	public	function __construct(User $User)
+	public function __construct(User $User)
 	{
 		$this->User	=	$User;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getDownlineSales()
+	public function getDownlineSales()
 	{
 		return $this->commissioninfo([
 			'username' => $this->User->getDistid()

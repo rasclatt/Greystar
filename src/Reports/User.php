@@ -5,13 +5,13 @@ class User extends \Greystar\Reports
 {
 	public	static	$types	=	[];
 	
-	public	function setRankNames(array $ranks)
+	public function setRankNames(array $ranks)
 	{
 		self:$types	=	$ranks;
 		return $this;
 	}
 	
-	public	function getTopEarners()
+	public function getTopEarners()
 	{
 		$args	=	func_get_args();
 		$args	=	(!empty($args[0]))? $args[0] : false;
@@ -45,7 +45,7 @@ class User extends \Greystar\Reports
 	*	@param	$limit	[numeric]	This is how many will return
 	*	@returns	If a value greater 1, returns a numeric array, other wise associative of top earner
 	*/
-	public	function getTopEarner($limit = 1)
+	public function getTopEarner($limit = 1)
 	{
 		if(empty($limit) || !is_numeric($limit))
 			$limit	=	1;
@@ -55,7 +55,7 @@ class User extends \Greystar\Reports
 		return ($limit > 1)? $data : $data[0];
 	}
 	
-	public	function getTopEarnerByRank($rank = 2, $limit = 1)
+	public function getTopEarnerByRank($rank = 2, $limit = 1)
 	{
 		if(!is_numeric($rank)) {
 			$rank	=	array_search(str_replace(' ','_',strtolower($rank)),self::$types);
@@ -75,7 +75,7 @@ class User extends \Greystar\Reports
 		return ($limit > 1)? $data : $data[0];
 	}
 	
-	public	function getDistInfo($username, $flags = [], $qv = false)
+	public function getDistInfo($username, $flags = [], $qv = false)
 	{
 		return $this->getHelper('Greystar\User')->getDistInfo($username, $flags, $qv);
 	}

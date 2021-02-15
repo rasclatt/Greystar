@@ -12,7 +12,7 @@ class Sales	extends \Greystar\Reports
 	*	@param	$start	[string|null]	String to get the START date of the query
 	*	@param	$end	[string|null]	String to get the END date of the query
 	*/
-	public	function getSalesByItems()
+	public function getSalesByItems()
 	{
 		$args	=	func_get_args();
 		$start	=	(!empty($args[0]))? $args[0] : $this->setDate('today - 1 month');
@@ -137,7 +137,7 @@ class Sales	extends \Greystar\Reports
 		return $data;
 	}
 	
-	public	function get()
+	public function get()
 	{
 		$args		=	func_get_args();
 		$def		=	(!empty($args[1]))? $args[1] : false;
@@ -179,7 +179,7 @@ class Sales	extends \Greystar\Reports
 		}
 	}
 	
-	public	function remoteFileExists($url)
+	public function remoteFileExists($url)
 	{
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_NOBODY, true);

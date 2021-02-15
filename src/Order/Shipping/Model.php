@@ -10,7 +10,7 @@ class Model extends \Greystar\Order\Controller
 	/**
 	 *	@description	
 	 */
-	public	function getOrdersToShip($country = false)
+	public function getOrdersToShip($country = false)
 	{
 		$Reports	=	new Reports();
 		$attr	=	[
@@ -65,7 +65,7 @@ class Model extends \Greystar\Order\Controller
 	/**
 	 *	@description	
 	 */
-	public	function getAllOrdersToShip($country = false, $backtime = 'today - 4 weeks')
+	public function getAllOrdersToShip($country = false, $backtime = 'today - 4 weeks')
 	{
 		$Reports	=	new Reports();
 		$attr	=	[

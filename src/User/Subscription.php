@@ -11,13 +11,13 @@ class Subscription extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function get($distid = false)
+	public function get($distid = false)
 	{
 		$array	=	[
 		  'distid' => $distid,
 		];
 		
-		$autoship	=	Model::getautoship($array);
+        $autoship	=	Model::getautoship($array);
 		
 		return (!empty($autoship['autoships']))? array_map(function($v) {
 			ArrayWorks::convertKeys($v, function($v){
@@ -30,7 +30,7 @@ class Subscription extends \Greystar\User
 	/**
 	 *	@description	Fetches the users products on an autoship
 	 */
-	public	function getProducts($distid)
+	public function getProducts($distid)
 	{
 		$array	=	[
 		  'distid' => $distid,
@@ -55,7 +55,7 @@ class Subscription extends \Greystar\User
 	/**
 	 *	@description	Checks if the user has an autoship set up
 	 */
-	public	function hasAutoShip($distid)
+	public function hasAutoShip($distid)
 	{
 		$arr	=	$this->get($distid);
 		return (isset($arr[0]['no_autoship']))? false : true;
@@ -63,7 +63,7 @@ class Subscription extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function saveCreditCard($distid, $data)
+	public function saveCreditCard($distid, $data)
 	{
 		foreach($data as $key => $value) {
 			$data[$key]	=	trim($value);

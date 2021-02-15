@@ -7,7 +7,7 @@ class Subscription extends \Greystar\Reports
 	
 	private	$arr;
 	
-	protected	function sortASData($as)
+	protected function sortASData($as)
 	{
 		$count	=	count($as);
 		$avbv	=	0;
@@ -42,37 +42,37 @@ class Subscription extends \Greystar\Reports
 		return $this;
 	}
 	
-	public	function getCount()
+	public function getCount()
 	{
 		return (isset($this->arr['count']))? $this->arr['count'] : false;
 	}
 	
-	public	function getAvgBv()
+	public function getAvgBv()
 	{
 		return (isset($this->arr['average_bv']))? $this->arr['average_bv'] : false;
 	}
 	
-	public	function getDetails()
+	public function getDetails()
 	{
 		return (isset($this->arr['data']))? $this->arr['data'] : false;
 	}
 	
-	public	function getBvBreakdown()
+	public function getBvBreakdown()
 	{
 		return (isset($this->arr['bv_breakdown']))? $this->arr['bv_breakdown'] : false;
 	}
 	
-	public	function getAll()
+	public function getAll()
 	{
 		return $this->arr;
 	}
 	
-	public	function getAllAutoships()
+	public function getAllAutoships()
 	{
 		return $this->getAutoshipsByDate();
 	}
 	
-	public	function getAutoshipsByDate($start = false, $end = false)
+	public function getAutoshipsByDate($start = false, $end = false)
 	{
 		$args	=	false;
 		
@@ -85,7 +85,7 @@ class Subscription extends \Greystar\Reports
 		return $this->sortASData($this->getReport('autoshipdata',$args));
 	}
 	
-	public	function getAutoshipsWithProducts($start, $end, $filtered = false)
+	public function getAutoshipsWithProducts($start, $end, $filtered = false)
 	{
 		$thisObj	=	$this;
 		return $this->getReport('autoshippendprod',['startdate' => $start,'enddate' => $end],false,function($response) use($filtered, $thisObj) {
@@ -98,7 +98,7 @@ class Subscription extends \Greystar\Reports
 		});
 	}
 	
-	public	function getChangesHistory($date)
+	public function getChangesHistory($date)
 	{
 		return $this->getReport('pastauto', ['startdate'=>$this->setDate($date),'enddate' => $date]);
 	}

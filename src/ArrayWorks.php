@@ -3,7 +3,7 @@ namespace Greystar;
 
 class ArrayWorks extends \Nubersoft\ArrayWorks
 {
-	public	static	function combineColumnRows($array,$headkey = 'Header',$countKey = 'Row Count')
+	public	static function combineColumnRows($array,$headkey = 'Header',$countKey = 'Row Count')
 	{
 		if(empty($array) || !is_array($array))
 			return $array;
@@ -32,7 +32,7 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 		return $array;
 	}
 	
-	public	static	function recursive($array,$kfunc = false,$vfunc = false)
+	public	static function recursive($array,$kfunc = false,$vfunc = false)
 	{
 		if(!is_array($array)) {
 			return (is_callable($vfunc))? $vfunc($array,false) : $array;
@@ -50,7 +50,7 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 		return $new;
 	}
 	
-	public	static	function convertKeys(&$array, $func = false)
+	public	static function convertKeys(&$array, $func = false)
 	{
 		foreach($array as $key => $value) {
 			if(is_array($value)) {
@@ -68,7 +68,7 @@ class ArrayWorks extends \Nubersoft\ArrayWorks
 			$array	=	$new;
 	}
 	
-	public	static	function convertValues(&$array)
+	public	static function convertValues(&$array)
 	{
 		foreach($array as $key => $value) {
 			$array[$key]	=	str_replace(['/','?',' '],['_or_','','_'],strtolower($value));

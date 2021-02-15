@@ -3,7 +3,7 @@ namespace Greystar;
 
 class Reports extends \Greystar\Model
 {	
-	public	function getDataTable($report,$args=false)
+	public function getDataTable($report,$args=false)
 	{
 		$def	=	[
 			'reportcode' => $report,
@@ -19,7 +19,7 @@ class Reports extends \Greystar\Model
 		return $data;
 	}
 	
-	public	function getTableDom($html)
+	public function getTableDom($html)
 	{
 		$DOM	=	new \DOMDocument('1.0', 'UTF-8');
 		# Stop errors
@@ -32,7 +32,7 @@ class Reports extends \Greystar\Model
 		return $tr;
 	}
 	
-	protected	function processDomTable($tr, &$anom, $func = false)
+	protected function processDomTable($tr, &$anom, $func = false)
 	{
 		$rows	=	[];
 		if($tr->length > 0) {
@@ -78,7 +78,7 @@ class Reports extends \Greystar\Model
 		return $rows;
 	}
 	
-	protected	function processCsvTable($tr, &$anom, $func = false)
+	protected function processCsvTable($tr, &$anom, $func = false)
 	{
 		$rows	=	[];
 		
@@ -122,12 +122,12 @@ class Reports extends \Greystar\Model
 		return $rows;
 	}
 	
-	public	function setDate($str,$mins = false)
+	public function setDate($str,$mins = false)
 	{
 		return date('Y-m-d'.(($mins)? " H:i:s":""),strtotime($str));
 	}
 	
-	public	function getReport($title, $args = false, $func = false, $override = false)
+	public function getReport($title, $args = false, $func = false, $override = false)
 	{
 		$anon	=	[];
 		$html	=	$this->getDataTable($title, $args);
@@ -179,7 +179,7 @@ class Reports extends \Greystar\Model
 			return $override($html);
 	}
 	
-	public	function buildCsvWithProducts($csv, $cut, $filtered = false)
+	public function buildCsvWithProducts($csv, $cut, $filtered = false)
 	{
 		$header	=	array_map(function($v){
 			return str_replace(' ', '_', strtolower($v));

@@ -5,7 +5,7 @@ namespace Greystar;
  */
 class Transaction extends \Greystar\Order\Model
 {
-	public	function chargeCard(array $input)
+	public function chargeCard(array $input)
 	{
 		$response	=	$this->creditcardcharge($array);
 		$success	=	(stripos($response['result'], 'success') !== false);

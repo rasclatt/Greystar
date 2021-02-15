@@ -9,7 +9,7 @@ class Locale extends \Greystar\Reports
 	/**
 	 *	@description	
 	 */
-	public	function getCountryList()
+	public function getCountryList()
 	{
 		foreach($this->getCountries() as $cou) {
 			$countries[$cou['country_code']]	=	$cou['country_name'];
@@ -18,7 +18,7 @@ class Locale extends \Greystar\Reports
 		return	$countries;
 	}
 	
-	public	function getCountries()
+	public function getCountries()
 	{
 		if(empty($this->list))
 			$this->list	=	$this->getReport('countrylisting');

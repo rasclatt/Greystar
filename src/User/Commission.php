@@ -11,24 +11,24 @@ class Commission extends \Greystar\User\Controller
 	
 	protected $distid;
 	
-	public	function __construct($distid)
+	public function __construct($distid)
 	{
 		$this->distid	=	$distid;
 	}
 	
-	public	function setData($data)
+	public function setData($data)
 	{
 		$this->data	=	$data;
 		return $this;
 	}
 	
-	public	function setTo($to)
+	public function setTo($to)
 	{
 		$this->to	=	$to;
 		return $this;
 	}
 	
-	public	function setFrom($from)
+	public function setFrom($from)
 	{
 		$this->from	=	$from;
 		return $this;
@@ -36,7 +36,7 @@ class Commission extends \Greystar\User\Controller
 	/**
 	 *	@description	
 	 */
-	public	function get($from = false, $to = false)
+	public function get($from = false, $to = false)
 	{
 		$to			=	(!empty($to))? $to : $this->to;
 		$from		=	(!empty($from))? $from : $this->from;
@@ -53,7 +53,7 @@ class Commission extends \Greystar\User\Controller
 	/**
 	 *	@description	
 	 */
-	public	function getChecks($country = false, $getAll = false, $from = false, $to = false)
+	public function getChecks($country = false, $getAll = false, $from = false, $to = false)
 	{
 		$to			=	(!empty($to))? $to : $this->to;
 		$from		=	(!empty($from))? $from : $this->from;
@@ -144,7 +144,7 @@ class Commission extends \Greystar\User\Controller
 	/**
 	 *	@description	
 	 */
-	public	function __call($class, $args=false)
+	public function __call($class, $args=false)
 	{	
 		switch($class) {
 			case('getData'):
@@ -174,7 +174,7 @@ class Commission extends \Greystar\User\Controller
 	/**
 	 *	@description	
 	 */
-	public	function __toString()
+	public function __toString()
 	{
 		return printpre($this->data);
 	}

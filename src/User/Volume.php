@@ -9,14 +9,14 @@ class Volume  extends \Greystar\User\Commission
 	/**
 	 *	@description	
 	 */
-	public	function __construct($distid)
+	public function __construct($distid)
 	{
 		$this->distid	=	$distid;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getVolume()
+	public function getVolume()
 	{
 		$args	=	func_get_args();
 		$func	=	(!empty($args[0]) && is_callable($args[0]))? $args[0] : false;
@@ -78,7 +78,7 @@ class Volume  extends \Greystar\User\Commission
 	/**
 	 *	@description	
 	 */
-	public	function getPersonalVolume()
+	public function getPersonalVolume()
 	{
 		$args		=	$this->getHelperClass('Greystar\Model')->binarypoints(['distid' => $this->distid]);
 		$this->setData([
@@ -89,7 +89,7 @@ class Volume  extends \Greystar\User\Commission
 		return $this;
 	}
 	
-	public	function getBanked($from = false, $to = false)
+	public function getBanked($from = false, $to = false)
 	{
 		$attr	=	[
 			'username' => $this->distid,
@@ -111,7 +111,7 @@ class Volume  extends \Greystar\User\Commission
 	/**
 	 *	@description	
 	 */
-	public	function getCV($back = 4)
+	public function getCV($back = 4)
 	{
 		$report	=	$this->getHelperClass('Greystar\Reports')->getReport('totalbv', [
 			'username' => $this->distid,

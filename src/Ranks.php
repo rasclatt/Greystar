@@ -9,7 +9,7 @@ class Ranks extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function addRank($name, $volume)
+	public	static function addRank($name, $volume)
 	{
 		self::$ranks[self::filterName($name)]	=	[
 			'name' => $name,
@@ -19,7 +19,7 @@ class Ranks extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function getRank($name = false)
+	public	static function getRank($name = false)
 	{
 		if($name){
 			$name	=	self::filterName($name);
@@ -31,7 +31,7 @@ class Ranks extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function getVolumeByRank($name)
+	public	static function getVolumeByRank($name)
 	{
 		$name	=	self::filterName($name);
 		return (isset(self::$ranks[$name]))? self::$ranks[$name]['volume'] : false;
@@ -39,7 +39,7 @@ class Ranks extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function getNextRank($name)
+	public	static function getNextRank($name)
 	{
 		$stop	=	false;
 		$name	=	self::filterName($name);
@@ -57,7 +57,7 @@ class Ranks extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static	function filterName($name)
+	public	static function filterName($name)
 	{
 		return strtolower(str_replace([' ','-'], '_', $name));
 	}

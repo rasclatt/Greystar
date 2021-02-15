@@ -5,14 +5,14 @@ use \Greystar\User\Volume;
 
 class Controller extends \Greystar\User
 {
-	public	function toRetail($distid)
+	public function toRetail($distid)
 	{
 		$this->modify(['username' => $distid, 'distrib' => 'R']);
 		
 		return $this->isRetail($distid);
 	}
 	
-	public	function toDistributor($distid, $leg = false)
+	public function toDistributor($distid, $leg = false)
 	{
 		if(!is_bool($leg)) {
 			$leg	=	(strtolower($leg) == 'l')? 0 : 1;
@@ -29,19 +29,19 @@ class Controller extends \Greystar\User
 		return empty($this->isRetail($distid));
 	}
 	
-	public	function isRetail($distid)
+	public function isRetail($distid)
 	{
 		return (strtolower($this->getDistType($distid)) == 'retail');
 	}
 	
-	public	function isDistributor($distid)
+	public function isDistributor($distid)
 	{
 		return (!$this->isRetail($distid));
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getUserSummaryBlock($distid, $enroller = false)
+	public function getUserSummaryBlock($distid, $enroller = false)
 	{
 		$Volume	=	new Volume($distid);
 		if($enroller) {
@@ -94,7 +94,7 @@ class Controller extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function saveFlag($distid, $flagname, $value)
+	public function saveFlag($distid, $flagname, $value)
 	{
 		return $this->modify([
 			'distid' => $distid,
@@ -105,7 +105,7 @@ class Controller extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function saveFlags($distid, $flags)
+	public function saveFlags($distid, $flags)
 	{
 		$args	=	[
 			'distid' => $distid

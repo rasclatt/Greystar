@@ -1,14 +1,12 @@
 <?php
 namespace Greystar\User;
 
-use \Rumor\Exception as Rumor;
-
 class Auth extends \Greystar\User
 {
 	/**
 	*	@description	Accesses the "verifylogin" action
 	*/
-	public	function validate($username, $password)
+	public function validate($username, $password)
 	{
 		return $this->verifylogin([
 			'distid'=>$username,
@@ -16,13 +14,13 @@ class Auth extends \Greystar\User
 		]);
 	}
 	
-	public	function emailToUser($username)
+	public function emailToUser($username)
 	{
 		# Strip out empties
 		$username	=	trim($username);
 		# If not long enough throw error
 		if(strlen($username) < 3)
-			throw new Rumor('Username can not be less than 3 characters.',2001);
+			throw new \Exception('Username can not be less than 3 characters.',2001);
 		
 		$nums	=	[
 			'z',#zero

@@ -7,14 +7,14 @@ class Genealogy extends \Greystar\User
 {
 	protected	$distid;
 	
-	public	function __construct($distid = false)
+	public function __construct($distid = false)
 	{
 		$this->distid	=	$distid;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function inDownline($parent_id, $child_id)
+	public function inDownline($parent_id, $child_id)
 	{
 		if($parent_id == $child_id)
 			return false;
@@ -29,7 +29,7 @@ class Genealogy extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function getUpline($distid = false)
+	public function getUpline($distid = false)
 	{
 		if(empty($distid))
 			$distid	=	$this->distid;
@@ -44,7 +44,7 @@ class Genealogy extends \Greystar\User
 	/**
 	 *	@description	
 	 */
-	public	function getSponsor($distid = false)
+	public function getSponsor($distid = false)
 	{
 		if(empty($distid))
 			$distid	=	$this->distid;

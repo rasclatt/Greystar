@@ -10,7 +10,7 @@ class Volume extends Model
 	/**
 	 *	@description	
 	 */
-	public	function __construct(User $User, $threshold)
+	public function __construct(User $User, $threshold)
 	{
 		$this->User			=	$User;
 		$this->threshold	=	$threshold;
@@ -18,7 +18,7 @@ class Volume extends Model
 	/**
 	 *	@description	This feature will not exist in most compensation plans.
 	 */
-	public	function setEnrollerVolumeAdjustments()
+	public function setEnrollerVolumeAdjustments()
 	{
 		# Fetch the raw data list
 		$data	=	$this->volchain([
@@ -71,14 +71,14 @@ class Volume extends Model
 	/**
 	 *	@description	This feature will not exist in most compensation plans.
 	 */
-	public	function getEnrollerVolume()
+	public function getEnrollerVolume()
 	{
 		return (isset($this->data['adjusted_volume']))? $this->data['adjusted_volume'] : 0;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getData()
+	public function getData()
 	{
 		return $this->data;
 	}
