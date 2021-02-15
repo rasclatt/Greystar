@@ -7,6 +7,7 @@ class Model extends \Nubersoft\nApp
 	private static $args;
 	protected static $endpoint;
 	protected static $creds;
+	protected static $error;
 	
 	protected static $error	=	[];
 	/**
@@ -85,8 +86,8 @@ class Model extends \Nubersoft\nApp
 		$data =   $this->fetchMethod($this->statement);
         # Stop if no data
 		if($data === false) {
-			throw new \Exception("A program error occurred when retrieving remote data. Try back later. It's not you, it's me!");
-			//trigger_error("An error occurred. If error persists, please contact customer support.");
+			trigger_error("An error occurred. If error persists, please contact customer support.");
+			self::$error	=	true;
 		}
 		return $data;
 	}
