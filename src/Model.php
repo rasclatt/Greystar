@@ -7,9 +7,7 @@ class Model extends \Nubersoft\nApp
 	private static $args;
 	protected static $endpoint;
 	protected static $creds;
-	protected static $error;
-	
-	protected static $error	=	[];
+	protected static $error	= [];
 	/**
 	 *	@description	Creates the endpoint
 	 *	@param	$endpoint	[string|empty]	Set using string, default will call a define()
