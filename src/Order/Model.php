@@ -6,14 +6,14 @@ class Model extends \Greystar\Model
 	private	$distid;
 	private	static	$order;
 	
-	public function __construct($distid = false)
+	public	function __construct($distid = false)
 	{
 		$this->distid	=	$distid;
 	}
 	/**
 	 *	@description	Creates an invoice
 	 */
-	public function create(array $input)
+	public	function create(array $input)
 	{
 		# Scrubs shipping and billing keys of "ing" incase they are set as such
 		$this->cleanKeys($input);
@@ -27,7 +27,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	Scrubs shipping and billing keys of "ing" incase they are set as such
 	 */
-	public function cleanKeys(&$array)
+	public	function cleanKeys(&$array)
 	{
 		if(!is_array($array))
 			return $array;
@@ -50,7 +50,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	Returns values from an array if set
 	 */
-	public function getArrayValue($array, $key, $default = false)
+	public	function getArrayValue($array, $key, $default = false)
 	{
 		if(!is_array($key))
 			$key	=	[$key];
@@ -65,7 +65,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	
 	 */
-	public function createWithAutoShip(array $array, array $products, $discount = 0, $shipping = 0)
+	public	function createWithAutoShip(array $array, array $products, $discount = 0, $shipping = 0)
 	{
 		$settings	=	[
 			'amount' => $this->getArrayValue($array, 'amount'),
@@ -148,7 +148,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	Marks an invoice as paid and adds a discount item if set
 	 */
-	public function markPaidWithDiscountedItems($distid, $invoice, $discount)
+	public	function markPaidWithDiscountedItems($distid, $invoice, $discount)
 	{
 		$rawOrder	=	$this->getInvoice(['inv' => $invoice, 'username' => $distid]);
 		
@@ -181,7 +181,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	Marks an invoice as paid and adds a discount item if set
 	 */
-	public function markPaidWithDiscount($distid, $invoice, $discount, $alterbv = true)
+	public	function markPaidWithDiscount($distid, $invoice, $discount, $alterbv = true)
 	{
 		# Set the final paramerters for marking paid
 		$order	=	[
@@ -207,21 +207,24 @@ class Model extends \Greystar\Model
 		return $this->modifyinvoice($order);
 	}
 	
-	public function markInvoicePaid($inv, $paid = true, $type = false)
+	public	function markInvoicePaid($inv, $paid = true, $type = false)
 	{
 		$invoice			=	$this->getInvoice($inv, $type);
 		$invoice['paid']	=	$paid;
 		return $this->modify($invoice);
 	}
 	
-	public function update(array $input)
+	public	function update(array $input)
 	{
 		# Sample method
 		$sdata	=	$this->modifyinvoice($input);
 	}
 	
-	public function getInvoice(...$args)
+	public	function getInvoice(...$args)
 	{
+		if(empty($args))
+			return [];
+			
 		if(!empty($args[0])) {
 			if(is_array($args[0])) {
 				$inv	=	false;
@@ -253,10 +256,6 @@ class Model extends \Greystar\Model
 		else
 			$array['username']	=	$this->distid;
 		
-		if(empty($array['username'])) { echo printpre();
-			trigger_error('Username/Distributor Id is required.');
-			return false;
-		}
 		$array['format']	=	'csv';
 		
 		return $this->doService('getinvoices', $array, function($results) use($inv) {
@@ -295,7 +294,7 @@ class Model extends \Greystar\Model
 		});
 	}
 	
-	public function getOrderDetails($type = 'response')
+	public	function getOrderDetails($type = 'response')
 	{
 		if(!empty($type))
 			return (isset(self::$order[$type]))? self::$order[$type] : false;
@@ -305,7 +304,7 @@ class Model extends \Greystar\Model
 	/**
 	 *	@description	
 	 */
-	public function hasPurchased($sku)
+	public	function hasPurchased($sku)
 	{
 		$data	=	$this->hasproduct(['distid' => $this->distid, 'product' => $sku]);
 		return key($data) == 'yes';
