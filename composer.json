@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "rasclatt/nubersoft": "1.*",
+        "rasclatt/nubersoft": "*",
         "block-ops/common-mlm-interface": "*"
     },
     "autoload": {
